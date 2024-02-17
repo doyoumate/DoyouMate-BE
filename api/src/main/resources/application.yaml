@@ -3,6 +3,8 @@ spring:
     include:
       - domain
       - common
+  main:
+    banner-mode: off
 ---
 spring:
   config:

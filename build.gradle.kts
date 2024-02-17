@@ -26,7 +26,14 @@ subprojects {
         plugin("io.spring.dependency-management")
     }
 
+    configurations {
+        all {
+            exclude("org.springframework.boot", "spring-boot-starter-logging")
+        }
+    }
+
     dependencies {
+        implementation("org.springframework.boot:spring-boot-starter-log4j2")
         implementation("org.springframework.boot:spring-boot-starter-webflux")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
