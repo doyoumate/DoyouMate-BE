@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Lecture(
     @Id
     val id: String,
+    val courseNumber: String,
+    val code: String,
     val year: Int,
     val grade: Int,
     val semester: Semester,
@@ -18,5 +20,5 @@ data class Lecture(
     val room: String,
     val date: String,
     val credit: Int,
-    val section: Section?,
+    val section: Section?
 )
