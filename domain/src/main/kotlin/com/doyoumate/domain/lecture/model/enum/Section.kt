@@ -16,4 +16,9 @@ enum class Section(
     HUMANITIES_AND_ARTS("인문예술영역", 15),
     DIGITAL_LITERACY("디지털 리터러시영역", 16),
     MVP_PLUS("MVP+", 17);
+
+    companion object {
+        operator fun invoke(id: Int): Section =
+            entries.first { it.id == id }
+    }
 }
