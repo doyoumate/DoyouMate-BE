@@ -11,10 +11,11 @@ data class Student(
     val id: String,
     val name: String,
     val birthDate: LocalDate,
-    val phoneNumber: String,
+    val phoneNumber: String?,
     val major: String,
     val grade: Int,
     val semester: Semester,
-    val gpa: Double?,
+    val status: String,
+    val gpa: Float?,
     var lectureIds: HashSet<String> = hashSetOf()
 )
