@@ -59,4 +59,31 @@ class LectureClient(
                     )
                 }
         }
+
+    fun getAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
+        LocalDate.now()
+            .let {
+                """
+                    <rqM2_F0 task="system.commonTask" action="comSelect" xda="academic.al.al04.al04_20050403_m_M2_F0_xda" con="sudev">
+                        <FCLT_GSCH_DIV_CD value=""/>
+                        <YY value="${it.year}"/>   
+                        <SHTM_CD value="${Semester(it).id}"/>   
+                        <STUNO value="$studentId"/>
+                    </rqM2_F0>
+                """
+            }
+            .let {
+                webClient.post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_XML)
+                    .bodyValue(it)
+                    .retrieve()
+                    .bodyToMono<String>()
+            }
+            .flatMapMany {
+                xmlMapper.getRows(it)
+            }.map {
+                it.get("ROW")
+                    .getValue("LECT_NO")
+            }
 }
