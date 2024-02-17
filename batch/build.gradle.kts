@@ -2,6 +2,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":common"))
     implementation("org.springframework.boot:spring-boot-starter-batch")
+    implementation("com.h2database:h2")
 }
 
 tasks {
