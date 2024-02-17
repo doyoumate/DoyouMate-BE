@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    include:
+      - domain
+      - common
+---
+spring:
   config:
     activate:
       on-profile: local
