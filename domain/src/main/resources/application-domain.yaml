@@ -1,0 +1,20 @@
+api:
+  uri: https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/doyoumate
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
