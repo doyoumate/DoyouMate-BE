@@ -1,3 +1,3 @@
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 }
