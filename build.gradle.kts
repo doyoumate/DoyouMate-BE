@@ -42,7 +42,6 @@ subprojects {
         testImplementation("com.ninja-squad:springmockk:3.0.1")
     }
 
-
     tasks {
         compileKotlin {
             kotlinOptions {
@@ -62,6 +61,5 @@ subprojects {
         test {
             useJUnitPlatform()
         }
-
     }
 }
