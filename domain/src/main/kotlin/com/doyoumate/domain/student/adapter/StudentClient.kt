@@ -88,10 +88,8 @@ class StudentClient(
                     .retrieve()
                     .bodyToMono<String>()
             }
-            .mapOrEmpty {
-                xmlMapper.readTree(it)
-                    .findValue("data")
-                    ?.run { if (isArray) first() else this }
+            .flatMap {
+                xmlMapper.getRow(it)
             }
             .map {
                 it.get("ROW")
@@ -110,10 +108,8 @@ class StudentClient(
                 .bodyValue(it)
                 .retrieve()
                 .bodyToMono<String>()
-        }.mapOrEmpty {
-            xmlMapper.readTree(it)
-                .findValue("data")
-                ?.run { if (isArray) first() else this }
+        }.flatMap {
+            xmlMapper.getRow(it)
         }.map {
             it.get("ROW")
                 .getValue("MBPHON_NO")

@@ -1,6 +1,7 @@
 package com.doyoumate.domain.lecture.adapter
 
 import com.doyoumate.common.annotation.Client
+import com.doyoumate.common.util.getRows
 import com.doyoumate.common.util.getValue
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
@@ -11,7 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toFlux
+import java.time.LocalDate
 
 @Client
 class LectureClient(
@@ -36,9 +37,7 @@ class LectureClient(
                 .retrieve()
                 .bodyToMono<String>()
         }.flatMapMany {
-            xmlMapper.readTree(it)
-                .path("data")
-                .toFlux()
+            xmlMapper.getRows(it)
         }.map {
             it.get("ROW")
                 .run {
@@ -60,4 +59,31 @@ class LectureClient(
                     )
                 }
         }
+
+    fun getAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
+        LocalDate.now()
+            .let {
+                """
+                    <rqM2_F0 task="system.commonTask" action="comSelect" xda="academic.al.al04.al04_20050403_m_M2_F0_xda" con="sudev">
+                        <FCLT_GSCH_DIV_CD value=""/>
+                        <YY value="${it.year}"/>   
+                        <SHTM_CD value="${Semester(it).id}"/>   
+                        <STUNO value="$studentId"/>
+                    </rqM2_F0>
+                """
+            }
+            .let {
+                webClient.post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_XML)
+                    .bodyValue(it)
+                    .retrieve()
+                    .bodyToMono<String>()
+            }
+            .flatMapMany {
+                xmlMapper.getRows(it)
+            }.map {
+                it.get("ROW")
+                    .getValue("LECT_NO")
+            }
 }
