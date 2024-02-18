@@ -40,7 +40,7 @@ class SynchronizeStudentsTasklet(
                             .collectList()
                     )
                     .map { (student, lectureIds) ->
-                        student.apply { this.lectureIds = lectureIds.toHashSet() }
+                        student.copy(lectureIds = lectureIds.toHashSet())
                     }
             }
 

@@ -17,5 +17,5 @@ data class Student(
     val semester: Semester,
     val status: String,
     val gpa: Float?,
-    var lectureIds: HashSet<String> = hashSetOf()
+    val lectureIds: HashSet<String> = hashSetOf()
 )
