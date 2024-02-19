@@ -5,6 +5,8 @@ dependencies {
     implementation(project(":common"))
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    testImplementation(testFixtures(project(":common")))
+    testImplementation(testFixtures(project(":domain")))
 }
 
 tasks {
