@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.h2database:h2")
+    implementation("com.github.earlgrey02:JWT:1.0.0")
 }
 
 tasks {
