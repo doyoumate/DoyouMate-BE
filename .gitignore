@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .DS_Store
+application-env.yaml
 
 ### STS ###
 .apt_generated
