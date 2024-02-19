@@ -1,6 +1,9 @@
 plugins {
     id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
+    id("java-library")
+    id("java-test-fixtures")
+    id("maven-publish")
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
 }
@@ -24,6 +27,9 @@ subprojects {
         plugin("kotlin-spring")
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
+        plugin("java-library")
+        plugin("java-test-fixtures")
+        plugin("maven-publish")
     }
 
     configurations {
