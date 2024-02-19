@@ -3,6 +3,7 @@ dependencies {
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testFixturesImplementation("org.springframework.restdocs:spring-restdocs-webtestclient")
+    testFixturesImplementation("org.springframework.security:spring-security-test")
     testFixturesImplementation("io.kotest:kotest-runner-junit5:5.6.2")
     testFixturesImplementation("io.kotest:kotest-assertions-core:5.6.2")
     testFixturesImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")

@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":common"))
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.github.earlgrey02:JWT:1.0.0")
     testImplementation(testFixtures(project(":common")))
