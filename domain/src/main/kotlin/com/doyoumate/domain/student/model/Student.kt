@@ -10,6 +10,7 @@ data class Student(
     @Id
     val id: String,
     val name: String,
+    val password: String? = null,
     val birthDate: LocalDate,
     val phoneNumber: String?,
     val major: String,
