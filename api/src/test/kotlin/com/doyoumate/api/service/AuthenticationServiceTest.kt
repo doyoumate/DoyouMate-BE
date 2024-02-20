@@ -8,10 +8,7 @@ import com.doyoumate.domain.auth.exception.CertificationAlreadyExistException
 import com.doyoumate.domain.auth.exception.InvalidCertificationException
 import com.doyoumate.domain.auth.exception.StudentNotFoundException
 import com.doyoumate.domain.auth.repository.CertificationRepository
-import com.doyoumate.domain.fixture.FROM
-import com.doyoumate.domain.fixture.createCertification
-import com.doyoumate.domain.fixture.createSendCertificationRequest
-import com.doyoumate.domain.fixture.createStudent
+import com.doyoumate.domain.fixture.*
 import com.doyoumate.domain.student.repository.StudentRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -50,6 +47,7 @@ class AuthenticationServiceTest : BehaviorSpec() {
                 }
             every { certificationRepository.findByStudentId(any()) } returns Mono.empty()
             every { messageService.sendOne(any()) } returns mockk()
+            every { passwordEncoder.encode(any()) } returns PASSWORD
 
             When("처음 인증 요청을 시도하면") {
                 val result = authenticationService.sendCertification(createSendCertificationRequest())
@@ -58,6 +56,17 @@ class AuthenticationServiceTest : BehaviorSpec() {
                 Then("정상적으로 인증번호가 전송된다.") {
                     result.expectSubscription()
                         .verifyComplete()
+                }
+            }
+
+            When("인증 없이 회원가입을 시도하면") {
+                val result = authenticationService.signUp(createSignUpRequest())
+                    .getResult()
+
+                Then("회원가입이 안된다.") {
+                    result.expectSubscription()
+                        .expectError<InvalidCertificationException>()
+                        .verify()
                 }
             }
         }
@@ -135,6 +144,30 @@ class AuthenticationServiceTest : BehaviorSpec() {
                     result.expectSubscription()
                         .expectError<AccountAlreadyExistException>()
                         .verify()
+                }
+            }
+        }
+
+        Given("인증을 완료한 유저의 경우") {
+            val student = createStudent(password = null)
+                .also {
+                    every { studentRepository.findById(any<String>()) } returns it
+                    every { studentRepository.save(any()) } returns it.copy(password = PASSWORD)
+                }
+            val certification = createCertification()
+                .also {
+                    every { certificationRepository.findByStudentId(any()) } returns it
+
+                }
+            every { passwordEncoder.encode(any()) } returns PASSWORD
+
+            When("회원가입을 시도하면") {
+                val result = authenticationService.signUp(createSignUpRequest())
+                    .getResult()
+
+                Then("정상적으로 회원가입이 완료된다.") {
+                    result.expectSubscription()
+                        .verifyComplete()
                 }
             }
         }
