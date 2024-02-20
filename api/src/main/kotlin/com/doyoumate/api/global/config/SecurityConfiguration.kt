@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
@@ -31,7 +32,9 @@ class SecurityConfiguration {
                 it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
             }
             authorizeExchange {
-                it.anyExchange()
+                it.pathMatchers("/auth/**")
+                    .permitAll()
+                    .anyExchange()
                     .authenticated()
             }
             addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHORIZATION)
@@ -41,4 +44,8 @@ class SecurityConfiguration {
     @Bean
     fun jwtFilter(jwtProvider: JwtProvider): ReactiveJwtFilter =
         ReactiveJwtFilter(jwtProvider)
+
+    @Bean
+    fun passwordEncoder(): BCryptPasswordEncoder =
+        BCryptPasswordEncoder()
 }

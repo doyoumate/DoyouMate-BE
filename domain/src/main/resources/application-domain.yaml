@@ -1,5 +1,6 @@
 api:
   uri: https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp
+expire: 10
 ---
 spring:
   config:
@@ -8,6 +9,9 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/doyoumate
+    redis:
+      host: localhost
+      port: 6379
 ---
 spring:
   config:
