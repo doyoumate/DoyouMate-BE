@@ -31,7 +31,9 @@ class SecurityConfiguration {
                 it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
             }
             authorizeExchange {
-                it.anyExchange()
+                it.pathMatchers("/auth/**")
+                    .permitAll()
+                    .anyExchange()
                     .authenticated()
             }
             addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHORIZATION)
