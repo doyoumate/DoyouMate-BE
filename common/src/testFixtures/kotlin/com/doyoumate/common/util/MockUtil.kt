@@ -10,5 +10,3 @@ infix fun <T> MockKStubScope<Mono<T>, *>.returns(value: T?): MockKAdditionalAnsw
 
 infix fun <T> MockKStubScope<Flux<T>, *>.returns(values: Iterable<T>): MockKAdditionalAnswerScope<Flux<T>, *> =
     returns(Flux.fromIterable(values))
-
-fun <T> empty(): Mono<T> = Mono.empty()

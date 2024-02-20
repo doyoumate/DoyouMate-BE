@@ -30,7 +30,7 @@ class AuthenticationControllerTest : ControllerTest() {
     init {
         describe("sendCertification()은") {
             context("처음 가입하는 학생이 인증을 요청하는 경우") {
-                every { authenticationService.sendCertification(any()) } returns empty()
+                every { authenticationService.sendCertification(any()) } returns Mono.empty()
 
                 it("상태 코드 200을 반환한다.") {
                     webClient

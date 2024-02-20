@@ -1,7 +1,6 @@
 package com.doyoumate.api.service
 
 import com.doyoumate.api.auth.service.AuthenticationService
-import com.doyoumate.common.util.empty
 import com.doyoumate.common.util.getResult
 import com.doyoumate.common.util.returns
 import com.doyoumate.domain.auth.exception.AccountAlreadyExistException
@@ -18,10 +17,14 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import net.nurigo.sdk.message.service.DefaultMessageService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import reactor.core.publisher.Mono
 import reactor.kotlin.test.expectError
 
 class AuthenticationServiceTest : BehaviorSpec() {
     private val studentRepository = mockk<StudentRepository>()
+
+    private val passwordEncoder = mockk<BCryptPasswordEncoder>()
 
     private val certificationRepository = mockk<CertificationRepository>()
 
@@ -30,6 +33,7 @@ class AuthenticationServiceTest : BehaviorSpec() {
     private val authenticationService = AuthenticationService(
         studentRepository = studentRepository,
         certificationRepository = certificationRepository,
+        passwordEncoder = passwordEncoder,
         messageService = messageService,
         from = FROM
     )
@@ -44,7 +48,7 @@ class AuthenticationServiceTest : BehaviorSpec() {
                 .also {
                     every { certificationRepository.save(any()) } returns it
                 }
-            every { certificationRepository.findByStudentId(any()) } returns empty()
+            every { certificationRepository.findByStudentId(any()) } returns Mono.empty()
             every { messageService.sendOne(any()) } returns mockk()
 
             When("처음 인증 요청을 시도하면") {
@@ -56,15 +60,11 @@ class AuthenticationServiceTest : BehaviorSpec() {
                         .verifyComplete()
                 }
             }
-
-            When("인증 요청을 시도한 후 다시 바로 인증 요청을 시도하면") {
-
-            }
         }
 
         Given("삼육대학교 학생이 아닌 유저가 서비스를 이용하는 경우") {
-            every { studentRepository.findById(any<String>()) } returns empty()
-            every { certificationRepository.findByStudentId(any()) } returns empty()
+            every { studentRepository.findById(any<String>()) } returns Mono.empty()
+            every { certificationRepository.findByStudentId(any()) } returns Mono.empty()
 
             When("인증 요청을 시도하면") {
                 val result = authenticationService.sendCertification(createSendCertificationRequest())
@@ -101,7 +101,7 @@ class AuthenticationServiceTest : BehaviorSpec() {
                 .also {
                     every { studentRepository.findById(any<String>()) } returns it
                 }
-            every { certificationRepository.findByStudentId(any()) } returns empty()
+            every { certificationRepository.findByStudentId(any()) } returns Mono.empty()
 
             When("인증 요청을 시도하면") {
                 val result = authenticationService.sendCertification(
@@ -125,7 +125,7 @@ class AuthenticationServiceTest : BehaviorSpec() {
                 .also {
                     every { certificationRepository.save(any()) } returns it
                 }
-            every { certificationRepository.findByStudentId(any()) } returns empty()
+            every { certificationRepository.findByStudentId(any()) } returns Mono.empty()
 
             When("인증 요청을 시도하면") {
                 val result = authenticationService.sendCertification(createSendCertificationRequest())
