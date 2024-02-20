@@ -13,6 +13,7 @@ import com.doyoumate.domain.auth.exception.CertificationAlreadyExistException
 import com.doyoumate.domain.auth.exception.InvalidCertificationException
 import com.doyoumate.domain.auth.exception.StudentNotFoundException
 import com.doyoumate.domain.fixture.createSendCertificationRequest
+import com.doyoumate.domain.fixture.createSignUpRequest
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.springframework.context.annotation.Import
@@ -29,6 +30,13 @@ class AuthenticationControllerTest : ControllerTest() {
     private val sendCertificationRequestFields = listOf(
         "studentId" bodyDesc "학번",
         "to" bodyDesc "전화번호"
+    )
+
+    private val signUpRequestFields = listOf(
+        "certification" bodyDesc "인증",
+        "certification.studentId" bodyDesc "학번",
+        "certification.code" bodyDesc "인증번호",
+        "password" bodyDesc "패스워드"
     )
 
     init {
@@ -125,6 +133,44 @@ class AuthenticationControllerTest : ControllerTest() {
                         .expectBody<Void>()
                         .document("회원가입을 위한 인증 요청 실패(409 - 12)") {
                             requestBody(sendCertificationRequestFields)
+                        }
+                }
+            }
+        }
+
+        describe("signUp()은") {
+            context("인증을 완료한 유저가 회원가입을 하는 경우") {
+                every { authenticationService.signUp(any()) } returns Mono.empty()
+
+                it("상태 코드 409를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/sign-up")
+                        .bodyValue(createSignUpRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectBody<Void>()
+                        .document("회원가입 성공(200)") {
+                            requestBody(signUpRequestFields)
+                        }
+                }
+            }
+
+            context("인증을 완료하지 않은 유저가 회원가입을 하는 경우") {
+                every { authenticationService.signUp(any()) } returns Mono.error(InvalidCertificationException())
+
+                it("상태 코드 409를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/sign-up")
+                        .bodyValue(createSignUpRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isEqualTo(403)
+                        .expectBody<Void>()
+                        .document("회원가입 실패(403)") {
+                            requestBody(signUpRequestFields)
                         }
                 }
             }
