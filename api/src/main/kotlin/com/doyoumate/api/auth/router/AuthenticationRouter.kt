@@ -14,6 +14,7 @@ class AuthenticationRouter {
         router {
             "/auth".nest {
                 POST("/certificate", handler::sendCertification)
+                POST("/sign-up", handler::signUp)
             }
         }
 }
