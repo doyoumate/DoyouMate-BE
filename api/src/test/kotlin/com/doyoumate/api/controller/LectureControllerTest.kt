@@ -59,7 +59,7 @@ class LectureControllerTest : ControllerTest() {
                         .expectStatus()
                         .isOk
                         .expectBody<LectureResponse>()
-                        .document("식별자를 통한 강의 조회 성공(200)") {
+                        .document("식별자를 통한 강의 단일 조회 성공(200)") {
                             pathParams("id" paramDesc "식별자")
                             responseBody(lectureResponseFields)
                         }
@@ -77,7 +77,7 @@ class LectureControllerTest : ControllerTest() {
                         .expectStatus()
                         .isEqualTo(404)
                         .expectBody<ErrorResponse>()
-                        .document("식별자를 통한 강의 조회 실패(404)") {
+                        .document("식별자를 통한 강의 단일 조회 실패(404)") {
                             pathParams("id" paramDesc "식별자")
                             responseBody(errorResponseFields)
                         }
