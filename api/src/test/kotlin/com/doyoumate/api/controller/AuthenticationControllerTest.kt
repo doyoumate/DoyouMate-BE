@@ -6,8 +6,10 @@ import com.doyoumate.api.auth.service.AuthenticationService
 import com.doyoumate.api.config.ApplicationConfiguration
 import com.doyoumate.api.config.SecurityTestConfiguration
 import com.doyoumate.common.controller.ControllerTest
+import com.doyoumate.common.dto.ErrorResponse
 import com.doyoumate.common.util.bodyDesc
 import com.doyoumate.common.util.document
+import com.doyoumate.common.util.errorResponseFields
 import com.doyoumate.domain.auth.exception.AccountAlreadyExistException
 import com.doyoumate.domain.auth.exception.CertificationAlreadyExistException
 import com.doyoumate.domain.auth.exception.InvalidCertificationException
@@ -64,7 +66,7 @@ class AuthenticationControllerTest : ControllerTest() {
                 every { authenticationService.sendCertification(any()) } returns
                     Mono.error(InvalidCertificationException())
 
-                it("상태 코드 403을 반환한다.") {
+                it("상태 코드 403과 ErrorResponse를 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/certificate")
@@ -72,9 +74,10 @@ class AuthenticationControllerTest : ControllerTest() {
                         .exchange()
                         .expectStatus()
                         .isEqualTo(403)
-                        .expectBody<Void>()
+                        .expectBody<ErrorResponse>()
                         .document("회원가입을 위한 인증 요청 실패(403)") {
                             requestBody(sendCertificationRequestFields)
+                            responseBody(errorResponseFields)
                         }
                 }
             }
@@ -83,7 +86,7 @@ class AuthenticationControllerTest : ControllerTest() {
                 every { authenticationService.sendCertification(any()) } returns
                     Mono.error(StudentNotFoundException())
 
-                it("상태 코드 404를 반환한다.") {
+                it("상태 코드 404와 ErrorResponse를 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/certificate")
@@ -91,9 +94,10 @@ class AuthenticationControllerTest : ControllerTest() {
                         .exchange()
                         .expectStatus()
                         .isEqualTo(404)
-                        .expectBody<Void>()
+                        .expectBody<ErrorResponse>()
                         .document("회원가입을 위한 인증 요청 실패(404)") {
                             requestBody(sendCertificationRequestFields)
+                            responseBody(errorResponseFields)
                         }
                 }
             }
@@ -102,7 +106,7 @@ class AuthenticationControllerTest : ControllerTest() {
                 every { authenticationService.sendCertification(any()) } returns
                     Mono.error(AccountAlreadyExistException())
 
-                it("상태 코드 409를 반환한다.") {
+                it("상태 코드 409와 ErrorResponse를 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/certificate")
@@ -110,9 +114,10 @@ class AuthenticationControllerTest : ControllerTest() {
                         .exchange()
                         .expectStatus()
                         .isEqualTo(409)
-                        .expectBody<Void>()
+                        .expectBody<ErrorResponse>()
                         .document("회원가입을 위한 인증 요청 실패(409 - 1)") {
                             requestBody(sendCertificationRequestFields)
+                            responseBody(errorResponseFields)
                         }
                 }
             }
@@ -122,7 +127,7 @@ class AuthenticationControllerTest : ControllerTest() {
                 every { authenticationService.sendCertification(any()) } returns
                     Mono.error(CertificationAlreadyExistException())
 
-                it("상태 코드 409를 반환한다.") {
+                it("상태 코드 409와 ErrorResponse를 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/certificate")
@@ -130,9 +135,10 @@ class AuthenticationControllerTest : ControllerTest() {
                         .exchange()
                         .expectStatus()
                         .isEqualTo(409)
-                        .expectBody<Void>()
-                        .document("회원가입을 위한 인증 요청 실패(409 - 12)") {
+                        .expectBody<ErrorResponse>()
+                        .document("회원가입을 위한 인증 요청 실패(409 - 2)") {
                             requestBody(sendCertificationRequestFields)
+                            responseBody(errorResponseFields)
                         }
                 }
             }
@@ -142,7 +148,7 @@ class AuthenticationControllerTest : ControllerTest() {
             context("인증을 완료한 유저가 회원가입을 하는 경우") {
                 every { authenticationService.signUp(any()) } returns Mono.empty()
 
-                it("상태 코드 409를 반환한다.") {
+                it("상태 코드 200을 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/sign-up")
@@ -160,7 +166,7 @@ class AuthenticationControllerTest : ControllerTest() {
             context("인증을 완료하지 않은 유저가 회원가입을 하는 경우") {
                 every { authenticationService.signUp(any()) } returns Mono.error(InvalidCertificationException())
 
-                it("상태 코드 409를 반환한다.") {
+                it("상태 코드 409와 ErrorResponse를 반환한다.") {
                     webClient
                         .post()
                         .uri("/auth/sign-up")
@@ -168,9 +174,10 @@ class AuthenticationControllerTest : ControllerTest() {
                         .exchange()
                         .expectStatus()
                         .isEqualTo(403)
-                        .expectBody<Void>()
+                        .expectBody<ErrorResponse>()
                         .document("회원가입 실패(403)") {
                             requestBody(signUpRequestFields)
+                            responseBody(errorResponseFields)
                         }
                 }
             }
