@@ -1,5 +1,6 @@
 package com.doyoumate.domain.fixture
 
+import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
@@ -17,6 +18,25 @@ fun createLectureResponse(
     lecture: Lecture = createLecture()
 ): LectureResponse =
     LectureResponse(lecture = lecture)
+
+fun createFilterResponse(
+    year: Set<Int> = setOf(YEAR),
+    grade: Set<Int> = setOf(GRADE),
+    semester: Set<String> = setOf(SEMESTER.semesterName),
+    major: Set<String> = setOf(MAJOR),
+    name: Set<String> = setOf(NAME),
+    credit: Set<Int> = setOf(CREDIT),
+    section: Set<String> = setOf(SECTION.sectionName)
+): FilterResponse =
+    FilterResponse(
+        year = year,
+        grade = grade,
+        semester = semester,
+        major = major,
+        name = name,
+        credit = credit,
+        section = section
+    )
 
 fun createLecture(
     id: String = ID,
