@@ -37,4 +37,8 @@ class LectureHandler(
                     )
                 )
         }
+
+    fun getFilter(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(lectureService.getFilter())
 }
