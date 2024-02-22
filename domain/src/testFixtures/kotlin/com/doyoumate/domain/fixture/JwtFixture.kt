@@ -11,6 +11,9 @@ const val REFRESH_TOKEN_EXPIRE = 10L
 val AUTHORITIES = setOf(SimpleGrantedAuthority("USER"))
 val jwtProvider = JwtConfiguration()
     .jwtProvider(SECRET_KEY, ACCESS_TOKEN_EXPIRE, REFRESH_TOKEN_EXPIRE)
+val AUTHENTICATION = createJwtAuthentication()
+val ACCESS_TOKEN = jwtProvider.createAccessToken(AUTHENTICATION)
+val REFRESH_TOKEN = jwtProvider.createRefreshToken(AUTHENTICATION)
 
 fun createJwtAuthentication(
     id: String = ID,
