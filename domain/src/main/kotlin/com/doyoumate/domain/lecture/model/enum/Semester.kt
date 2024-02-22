@@ -12,6 +12,9 @@ enum class Semester(
     SECOND_SEASONAL("2학기 계절", 25);
 
     companion object {
+        operator fun invoke(semesterName: String): Semester =
+            entries.first { it.semesterName == semesterName }
+
         operator fun invoke(id: Int): Semester =
             entries.first { it.id == id }
 

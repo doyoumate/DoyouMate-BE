@@ -9,6 +9,7 @@ import com.doyoumate.common.controller.ControllerTest
 import com.doyoumate.common.dto.ErrorResponse
 import com.doyoumate.common.util.*
 import com.doyoumate.domain.fixture.ID
+import com.doyoumate.domain.fixture.NAME
 import com.doyoumate.domain.fixture.createLectureResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
@@ -100,6 +101,26 @@ class LectureControllerTest : ControllerTest() {
                         .isOk
                         .expectBody<List<LectureResponse>>()
                         .document("강의 전체 조회 성공(200)") {
+                            responseBody(lectureResponseFields.toListFields())
+                        }
+                }
+            }
+        }
+
+        describe("searchLectures()는") {
+            context("강의가 존재하는 경우") {
+                every { lectureService.searchLectures(any(), any(), any(), any(), any(), any(), any()) } returns
+                    listOf(createLectureResponse())
+
+                it("상태 코드 200과 LectureResponse들을 반환한다.") {
+                    webClient
+                        .get()
+                        .uri("/lecture?name={name}", NAME)
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectBody<List<LectureResponse>>()
+                        .document("강의 검색 성공(200)") {
                             responseBody(lectureResponseFields.toListFields())
                         }
                 }
