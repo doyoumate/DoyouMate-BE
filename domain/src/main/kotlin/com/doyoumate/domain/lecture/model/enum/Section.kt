@@ -18,6 +18,9 @@ enum class Section(
     MVP_PLUS("MVP+", 17);
 
     companion object {
+        operator fun invoke(sectionName: String): Section =
+            entries.first { it.sectionName == sectionName }
+
         operator fun invoke(id: Int): Section =
             entries.first { it.id == id }
     }
