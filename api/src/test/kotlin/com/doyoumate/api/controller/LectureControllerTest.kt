@@ -10,7 +10,9 @@ import com.doyoumate.common.dto.ErrorResponse
 import com.doyoumate.common.util.*
 import com.doyoumate.domain.fixture.ID
 import com.doyoumate.domain.fixture.NAME
+import com.doyoumate.domain.fixture.createFilterResponse
 import com.doyoumate.domain.fixture.createLectureResponse
+import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
 import com.ninjasquad.springmockk.MockkBean
@@ -39,6 +41,16 @@ class LectureControllerTest : ControllerTest() {
         "professor" bodyDesc "교수",
         "room" bodyDesc "강의실",
         "date" bodyDesc "시간",
+        "credit" bodyDesc "학점",
+        "section" bodyDesc "영역"
+    )
+
+    private val filterResponseFields = listOf(
+        "year" bodyDesc "연도",
+        "grade" bodyDesc "학년",
+        "semester" bodyDesc "학기",
+        "major" bodyDesc "전공",
+        "name" bodyDesc "강의명",
         "credit" bodyDesc "학점",
         "section" bodyDesc "영역"
     )
@@ -122,6 +134,25 @@ class LectureControllerTest : ControllerTest() {
                         .expectBody<List<LectureResponse>>()
                         .document("강의 검색 성공(200)") {
                             responseBody(lectureResponseFields.toListFields())
+                        }
+                }
+            }
+        }
+
+        describe("getFilter()는") {
+            context("강의가 존재하는 경우") {
+                every { lectureService.getFilter() } returns createFilterResponse()
+
+                it("상태 코드 200과 Filter를 반환한다.") {
+                    webClient
+                        .get()
+                        .uri("/lecture/filter")
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectBody<FilterResponse>()
+                        .document("강의 필터 조회 성공(200)") {
+                            responseBody(filterResponseFields)
                         }
                 }
             }
