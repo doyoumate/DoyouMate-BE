@@ -14,6 +14,7 @@ class LectureRouter {
     fun lectureRoutes(handler: LectureHandler): RouterFunction<ServerResponse> =
         router {
             "/lecture".nest {
+                GET("/filter", handler::getFilter)
                 GET("/{id}", handler::getLectureById)
                 GET("", queryParams("name"), handler::searchLectures)
                 GET("", handler::getLectures)
