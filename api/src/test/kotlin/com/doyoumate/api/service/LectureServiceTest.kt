@@ -7,6 +7,7 @@ import com.doyoumate.domain.fixture.ID
 import com.doyoumate.domain.fixture.createLecture
 import com.doyoumate.domain.fixture.createLectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
+import com.doyoumate.domain.lecture.repository.CustomLectureRepository
 import com.doyoumate.domain.lecture.repository.LectureRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -17,8 +18,11 @@ import reactor.kotlin.test.expectError
 class LectureServiceTest : BehaviorSpec() {
     private val lectureRepository = mockk<LectureRepository>()
 
+    private val customLectureRepository = mockk<CustomLectureRepository>()
+
     private val lectureService = LectureService(
-        lectureRepository = lectureRepository
+        lectureRepository = lectureRepository,
+        customLectureRepository = customLectureRepository
     )
 
     init {
@@ -27,6 +31,11 @@ class LectureServiceTest : BehaviorSpec() {
                 .also {
                     every { lectureRepository.findById(any<String>()) } returns it
                     every { lectureRepository.findAll() } returns listOf(it)
+                    every {
+                        customLectureRepository.searchLectures(
+                            any(), any(), any(), any(), any(), any(), any()
+                        )
+                    } returns listOf(it)
                 }
 
             When("식별자를 통해 특정 강의를 조회하면") {
@@ -45,6 +54,18 @@ class LectureServiceTest : BehaviorSpec() {
                     .getResult()
 
                 Then("모든 강의가 조회된다.") {
+                    result.expectSubscription()
+                        .expectNext(createLectureResponse(lecture))
+                        .verifyComplete()
+                }
+            }
+
+            When("특정 강의를 검색하면") {
+                val result = lecture.run {
+                    lectureService.searchLectures(year, grade, semester, major, name, credit, section)
+                }.getResult()
+
+                Then("해당 강의가 조회된다.") {
                     result.expectSubscription()
                         .expectNext(createLectureResponse(lecture))
                         .verifyComplete()
