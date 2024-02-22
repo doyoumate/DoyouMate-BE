@@ -1,5 +1,6 @@
 package com.doyoumate.api.lecture.service
 
+import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
 import com.doyoumate.domain.lecture.model.enum.Section
@@ -35,4 +36,6 @@ class LectureService(
     ): Flux<LectureResponse> =
         customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section)
             .map { LectureResponse(it) }
+
+    fun getFilter(): Mono<FilterResponse> = lectureRepository.getFilter()
 }

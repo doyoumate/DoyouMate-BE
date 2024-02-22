@@ -4,6 +4,7 @@ import com.doyoumate.api.lecture.service.LectureService
 import com.doyoumate.common.util.getResult
 import com.doyoumate.common.util.returns
 import com.doyoumate.domain.fixture.ID
+import com.doyoumate.domain.fixture.createFilterResponse
 import com.doyoumate.domain.fixture.createLecture
 import com.doyoumate.domain.fixture.createLectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
@@ -37,6 +38,7 @@ class LectureServiceTest : BehaviorSpec() {
                         )
                     } returns listOf(it)
                 }
+            every { lectureRepository.getFilter() } returns createFilterResponse()
 
             When("식별자를 통해 특정 강의를 조회하면") {
                 val result = lectureService.getLectureById(ID)
@@ -68,6 +70,17 @@ class LectureServiceTest : BehaviorSpec() {
                 Then("해당 강의가 조회된다.") {
                     result.expectSubscription()
                         .expectNext(createLectureResponse(lecture))
+                        .verifyComplete()
+                }
+            }
+
+            When("필터를 조회하면") {
+                val result = lectureService.getFilter()
+                    .getResult()
+
+                Then("강의의 각 필드에 대한 필터가 조회된다.") {
+                    result.expectSubscription()
+                        .expectNext(createFilterResponse())
                         .verifyComplete()
                 }
             }
