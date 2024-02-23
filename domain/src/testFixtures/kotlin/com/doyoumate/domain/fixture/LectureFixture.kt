@@ -17,7 +17,7 @@ val SECTION = Section.BASIC_EDUCATION
 fun createLectureResponse(
     lecture: Lecture = createLecture()
 ): LectureResponse =
-    LectureResponse(lecture = lecture)
+    LectureResponse(lecture)
 
 fun createFilterResponse(
     year: Set<Int> = setOf(YEAR),
