@@ -2,11 +2,11 @@ package com.doyoumate.domain.fixture
 
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.student.model.Student
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.time.LocalDate
 
 const val NAME = "얼그레이"
-val PASSWORD = BCryptPasswordEncoder().encode("root")!!
+const val ROW_PASSWORD = "root"
+val PASSWORD = passwordEncoder.encode(ROW_PASSWORD)!!
 val BIRTH_DATE = LocalDate.of(2002, 1, 1)!!
 const val PHONE_NUMBER = "01012345678"
 const val MAJOR = "컴퓨터공학부"
