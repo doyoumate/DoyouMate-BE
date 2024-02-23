@@ -10,10 +10,11 @@ import com.doyoumate.common.dto.ErrorResponse
 import com.doyoumate.common.util.bodyDesc
 import com.doyoumate.common.util.document
 import com.doyoumate.common.util.errorResponseFields
-import com.doyoumate.domain.auth.exception.AccountAlreadyExistException
-import com.doyoumate.domain.auth.exception.CertificationAlreadyExistException
-import com.doyoumate.domain.auth.exception.InvalidCertificationException
-import com.doyoumate.domain.auth.exception.StudentNotFoundException
+import com.doyoumate.common.util.returns
+import com.doyoumate.domain.auth.dto.response.LoginResponse
+import com.doyoumate.domain.auth.exception.*
+import com.doyoumate.domain.fixture.createLoginRequest
+import com.doyoumate.domain.fixture.createLoginResponse
 import com.doyoumate.domain.fixture.createSendCertificationRequest
 import com.doyoumate.domain.fixture.createSignUpRequest
 import com.ninjasquad.springmockk.MockkBean
@@ -39,6 +40,16 @@ class AuthenticationControllerTest : ControllerTest() {
         "certification.studentId" bodyDesc "학번",
         "certification.code" bodyDesc "인증번호",
         "password" bodyDesc "패스워드"
+    )
+
+    private val loginRequestFields = listOf(
+        "studentId" bodyDesc "학번",
+        "password" bodyDesc "패스워드"
+    )
+
+    private val loginResponseFields = listOf(
+        "accessToken" bodyDesc "액세스 토큰",
+        "refreshToken" bodyDesc "리프레쉬 토큰"
     )
 
     init {
@@ -177,6 +188,83 @@ class AuthenticationControllerTest : ControllerTest() {
                         .expectBody<ErrorResponse>()
                         .document("회원가입 실패(403)") {
                             requestBody(signUpRequestFields)
+                            responseBody(errorResponseFields)
+                        }
+                }
+            }
+        }
+
+        describe("login()은") {
+            context("올바른 유저 정보를 입력하면") {
+                every { authenticationService.login(any()) } returns createLoginResponse()
+
+                it("상태 코드 200과 LoginResponse를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/login")
+                        .bodyValue(createLoginRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isOk
+                        .expectBody<LoginResponse>()
+                        .document("로그인 성공(200)") {
+                            requestBody(loginRequestFields)
+                            responseBody(loginResponseFields)
+                        }
+                }
+            }
+
+            context("올바르지 않은 유저 정보를 입력하면") {
+                every { authenticationService.login(any()) } returns Mono.error(PasswordNotMatchedException())
+
+                it("상태 코드 403과 ErrorResponse를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/login")
+                        .bodyValue(createLoginRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isEqualTo(403)
+                        .expectBody<ErrorResponse>()
+                        .document("로그인 실패(403)") {
+                            requestBody(loginRequestFields)
+                            responseBody(errorResponseFields)
+                        }
+                }
+            }
+            context("존재하지 않는 학생 정보를 입력하면") {
+                every { authenticationService.login(any()) } returns Mono.error(StudentNotFoundException())
+
+                it("상태 코드 404와 ErrorResponse를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/login")
+                        .bodyValue(createLoginRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isEqualTo(404)
+                        .expectBody<ErrorResponse>()
+                        .document("로그인 실패(404 - 1)") {
+                            requestBody(loginRequestFields)
+                            responseBody(errorResponseFields)
+                        }
+                }
+            }
+
+            context("존재하지 않는 유저 정보를 입력하면") {
+                every { authenticationService.login(any()) } returns Mono.error(AccountNotFoundException())
+
+                it("상태 코드 404와 ErrorResponse를 반환한다.") {
+                    webClient
+                        .post()
+                        .uri("/auth/login")
+                        .bodyValue(createLoginRequest())
+                        .exchange()
+                        .expectStatus()
+                        .isEqualTo(404)
+                        .expectBody<ErrorResponse>()
+                        .document("로그인 실패(404 - 2)") {
+                            requestBody(loginRequestFields)
                             responseBody(errorResponseFields)
                         }
                 }
