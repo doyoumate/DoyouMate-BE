@@ -17,6 +17,7 @@ import com.doyoumate.domain.fixture.createLoginRequest
 import com.doyoumate.domain.fixture.createLoginResponse
 import com.doyoumate.domain.fixture.createSendCertificationRequest
 import com.doyoumate.domain.fixture.createSignUpRequest
+import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.springframework.context.annotation.Import
