@@ -12,6 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
+import org.springframework.web.reactive.function.server.ServerRequest
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.cast
 
 @EnableWebFluxSecurity
 @Configuration
@@ -49,3 +52,7 @@ class SecurityConfiguration {
     fun passwordEncoder(): BCryptPasswordEncoder =
         BCryptPasswordEncoder()
 }
+
+fun ServerRequest.getAuthentication(): Mono<JwtAuthentication> =
+    principal()
+        .cast<JwtAuthentication>()
