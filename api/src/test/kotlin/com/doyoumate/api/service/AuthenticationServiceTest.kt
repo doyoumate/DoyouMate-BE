@@ -6,6 +6,7 @@ import com.doyoumate.common.util.returns
 import com.doyoumate.domain.auth.exception.*
 import com.doyoumate.domain.auth.repository.CertificationRepository
 import com.doyoumate.domain.fixture.*
+import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every

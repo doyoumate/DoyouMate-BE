@@ -1,4 +1,4 @@
-package com.doyoumate.domain.auth.exception
+package com.doyoumate.domain.student.exception
 
 import com.doyoumate.common.exception.ServerException
 

@@ -7,6 +7,7 @@ import com.doyoumate.domain.auth.dto.response.LoginResponse
 import com.doyoumate.domain.auth.exception.*
 import com.doyoumate.domain.auth.model.Certification
 import com.doyoumate.domain.auth.repository.CertificationRepository
+import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.model.Student
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.core.JwtProvider
