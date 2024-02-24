@@ -26,5 +26,5 @@ interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
             """
         ]
     )
-    fun getFilter(): Mono<FilterResponse>
+    fun getFilter(): Mono<Filter>
 }

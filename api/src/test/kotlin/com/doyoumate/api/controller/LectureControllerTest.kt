@@ -50,7 +50,6 @@ class LectureControllerTest : ControllerTest() {
         "grade" bodyDesc "학년",
         "semester" bodyDesc "학기",
         "major" bodyDesc "전공",
-        "name" bodyDesc "강의명",
         "credit" bodyDesc "학점",
         "section" bodyDesc "영역"
     )
