@@ -15,7 +15,7 @@ const val GRADE = 2
 val SEMESTER = Semester.FIRST
 const val STATUS = "재학"
 const val GPA = 4.3F
-val LECTURE_IDS = hashSetOf("1", "2", "2")
+val LECTURE_IDS = hashSetOf(ID)
 
 fun createStudentResponse(
     student: Student = createStudent()
