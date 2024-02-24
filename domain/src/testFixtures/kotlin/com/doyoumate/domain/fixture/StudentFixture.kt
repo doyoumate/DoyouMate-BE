@@ -15,32 +15,12 @@ const val GRADE = 2
 val SEMESTER = Semester.FIRST
 const val STATUS = "재학"
 const val GPA = 4.3F
-val LECTURE_IDS = hashSetOf("1", "2", "2")
+val LECTURE_IDS = hashSetOf(ID)
 
 fun createStudentResponse(
-    id: String = ID,
-    name: String = NAME,
-    birthDate: LocalDate = BIRTH_DATE,
-    phoneNumber: String? = PHONE_NUMBER,
-    major: String = MAJOR,
-    grade: Int = GRADE,
-    semester: Semester = SEMESTER,
-    status: String = STATUS,
-    gpa: Float? = GPA,
-    lectureIds: HashSet<String> = LECTURE_IDS.toHashSet()
+    student: Student = createStudent()
 ): StudentResponse =
-    StudentResponse(
-        id = id,
-        name = name,
-        birthDate = birthDate,
-        phoneNumber = phoneNumber,
-        major = major,
-        grade = grade,
-        semester = semester.semesterName,
-        status = status,
-        gpa = gpa,
-        lectureIds = lectureIds
-    )
+    StudentResponse(student)
 
 fun createStudent(
     id: String = ID,

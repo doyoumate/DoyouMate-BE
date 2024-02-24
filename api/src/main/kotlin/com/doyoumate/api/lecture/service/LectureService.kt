@@ -37,5 +37,7 @@ class LectureService(
         customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section)
             .map { LectureResponse(it) }
 
-    fun getFilter(): Mono<FilterResponse> = lectureRepository.getFilter()
+    fun getFilter(): Mono<FilterResponse> =
+        lectureRepository.getFilter()
+            .map { FilterResponse(it) }
 }

@@ -1,6 +1,7 @@
 package com.doyoumate.api.global.config
 
 import com.github.jwt.core.JwtProvider
+import com.github.jwt.security.JwtAuthentication
 import com.github.jwt.security.ReactiveJwtFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
+import org.springframework.web.reactive.function.server.ServerRequest
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.cast
 
 @EnableWebFluxSecurity
 @Configuration
@@ -49,3 +53,7 @@ class SecurityConfiguration {
     fun passwordEncoder(): BCryptPasswordEncoder =
         BCryptPasswordEncoder()
 }
+
+fun ServerRequest.getAuthentication(): Mono<JwtAuthentication> =
+    principal()
+        .cast<JwtAuthentication>()

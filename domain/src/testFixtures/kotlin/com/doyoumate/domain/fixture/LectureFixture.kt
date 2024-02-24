@@ -2,6 +2,7 @@ package com.doyoumate.domain.fixture
 
 import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
+import com.doyoumate.domain.lecture.model.Filter
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
@@ -17,14 +18,13 @@ val SECTION = Section.BASIC_EDUCATION
 fun createLectureResponse(
     lecture: Lecture = createLecture()
 ): LectureResponse =
-    LectureResponse(lecture = lecture)
+    LectureResponse(lecture)
 
 fun createFilterResponse(
     year: Set<Int> = setOf(YEAR),
     grade: Set<Int> = setOf(GRADE),
     semester: Set<String> = setOf(SEMESTER.semesterName),
     major: Set<String> = setOf(MAJOR),
-    name: Set<String> = setOf(NAME),
     credit: Set<Int> = setOf(CREDIT),
     section: Set<String> = setOf(SECTION.sectionName)
 ): FilterResponse =
@@ -33,7 +33,6 @@ fun createFilterResponse(
         grade = grade,
         semester = semester,
         major = major,
-        name = name,
         credit = credit,
         section = section
     )
@@ -65,6 +64,23 @@ fun createLecture(
         professor = professor,
         room = room,
         date = date,
+        credit = credit,
+        section = section
+    )
+
+fun createFilter(
+    year: Set<Int> = setOf(YEAR),
+    grade: Set<Int> = setOf(GRADE),
+    semester: Set<Semester> = setOf(SEMESTER),
+    major: Set<String> = setOf(MAJOR),
+    credit: Set<Int> = setOf(CREDIT),
+    section: Set<Section> = setOf(SECTION)
+): Filter =
+    Filter(
+        year = year,
+        grade = grade,
+        semester = semester,
+        major = major,
         credit = credit,
         section = section
     )
