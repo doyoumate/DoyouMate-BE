@@ -7,6 +7,7 @@ import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.lecture.repository.CustomLectureRepository
 import com.doyoumate.domain.lecture.repository.LectureRepository
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -32,9 +33,10 @@ class LectureService(
         major: String?,
         name: String,
         credit: Int?,
-        section: Section?
+        section: Section?,
+        pageable: Pageable
     ): Flux<LectureResponse> =
-        customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section)
+        customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section, pageable)
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =

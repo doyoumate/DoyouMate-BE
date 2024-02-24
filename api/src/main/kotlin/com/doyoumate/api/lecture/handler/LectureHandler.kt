@@ -5,6 +5,7 @@ import com.doyoumate.common.annotation.Handler
 import com.doyoumate.common.util.getQueryParam
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
+import org.springframework.data.domain.PageRequest
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
@@ -33,7 +34,8 @@ class LectureHandler(
                         getQueryParam("major"),
                         getQueryParam("name")!!,
                         getQueryParam("credit"),
-                        getQueryParam<String>("section")?.let { Section(it) }
+                        getQueryParam<String>("section")?.let { Section(it) },
+                        PageRequest.of(getQueryParam<Int>("page")!!, getQueryParam<Int>("size")!!)
                     )
                 )
         }
