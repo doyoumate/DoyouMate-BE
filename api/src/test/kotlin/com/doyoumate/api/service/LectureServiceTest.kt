@@ -31,7 +31,7 @@ class LectureServiceTest : BehaviorSpec() {
                     every { lectureRepository.findAll() } returns listOf(it)
                     every {
                         customLectureRepository.searchLectures(
-                            any(), any(), any(), any(), any(), any(), any()
+                            any(), any(), any(), any(), any(), any(), any(), any()
                         )
                     } returns listOf(it)
                 }
@@ -61,7 +61,7 @@ class LectureServiceTest : BehaviorSpec() {
 
             When("특정 강의를 검색하면") {
                 val result = lecture.run {
-                    lectureService.searchLectures(year, grade, semester, major, name, credit, section)
+                    lectureService.searchLectures(year, grade, semester, major, name, credit, section, createPageable())
                 }.getResult()
 
                 Then("해당 강의가 조회된다.") {

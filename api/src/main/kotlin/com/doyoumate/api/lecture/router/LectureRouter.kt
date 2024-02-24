@@ -16,7 +16,7 @@ class LectureRouter {
             "/lecture".nest {
                 GET("/filter", handler::getFilter)
                 GET("/{id}", handler::getLectureById)
-                GET("", queryParams("name"), handler::searchLectures)
+                GET("", queryParams("name", "page", "size"), handler::searchLectures)
                 GET("", handler::getLectures)
             }
         }

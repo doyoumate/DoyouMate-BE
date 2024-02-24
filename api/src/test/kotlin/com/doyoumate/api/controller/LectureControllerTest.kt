@@ -8,10 +8,7 @@ import com.doyoumate.api.lecture.service.LectureService
 import com.doyoumate.common.controller.ControllerTest
 import com.doyoumate.common.dto.ErrorResponse
 import com.doyoumate.common.util.*
-import com.doyoumate.domain.fixture.ID
-import com.doyoumate.domain.fixture.NAME
-import com.doyoumate.domain.fixture.createFilterResponse
-import com.doyoumate.domain.fixture.createLectureResponse
+import com.doyoumate.domain.fixture.*
 import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
@@ -119,19 +116,32 @@ class LectureControllerTest : ControllerTest() {
         }
 
         describe("searchLectures()는") {
+            withMockUser()
+
             context("강의가 존재하는 경우") {
-                every { lectureService.searchLectures(any(), any(), any(), any(), any(), any(), any()) } returns
+                every { lectureService.searchLectures(any(), any(), any(), any(), any(), any(), any(), any()) } returns
                     listOf(createLectureResponse())
 
                 it("상태 코드 200과 LectureResponse들을 반환한다.") {
                     webClient
                         .get()
-                        .uri("/lecture?name={name}", NAME)
+                        .uri("/lecture?name={name}&page={page}&size={size}", NAME, PAGE, SIZE)
                         .exchange()
                         .expectStatus()
                         .isOk
                         .expectBody<List<LectureResponse>>()
                         .document("강의 검색 성공(200)") {
+                            queryParams(
+                                ("year" paramDesc "연도").optional(),
+                                ("grade" paramDesc "학년").optional(),
+                                ("semester" paramDesc "학기").optional(),
+                                ("major" paramDesc "과").optional(),
+                                "name" paramDesc "강의명",
+                                ("credit" paramDesc "학점").optional(),
+                                ("section" paramDesc "영역").optional(),
+                                "page" paramDesc "페이지 번호",
+                                "size" paramDesc "페이지 크기"
+                            )
                             responseBody(lectureResponseFields.toListFields())
                         }
                 }
@@ -139,6 +149,8 @@ class LectureControllerTest : ControllerTest() {
         }
 
         describe("getFilter()는") {
+            withMockUser()
+
             context("강의가 존재하는 경우") {
                 every { lectureService.getFilter() } returns createFilterResponse()
 
