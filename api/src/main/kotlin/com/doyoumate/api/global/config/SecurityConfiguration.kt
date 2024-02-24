@@ -1,6 +1,7 @@
 package com.doyoumate.api.global.config
 
 import com.github.jwt.core.JwtProvider
+import com.github.jwt.security.JwtAuthentication
 import com.github.jwt.security.ReactiveJwtFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
