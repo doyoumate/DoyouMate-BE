@@ -14,14 +14,14 @@ data class FilterResponse(
         operator fun invoke(filter: Filter): FilterResponse =
             with(filter) {
                 FilterResponse(
-                    year = year,
-                    grade = grade,
+                    year = year.toSortedSet(compareByDescending { it }),
+                    grade = grade.toSortedSet(),
                     semester = semester.map { it.semesterName }
-                        .toSet(),
-                    major = major,
-                    credit = credit,
+                        .toSortedSet(),
+                    major = major.toSortedSet(),
+                    credit = credit.toSortedSet(),
                     section = section.map { it.sectionName }
-                        .toSet()
+                        .toSortedSet()
                 )
             }
     }
