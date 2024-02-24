@@ -4,6 +4,7 @@ import com.doyoumate.domain.global.util.query
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.stereotype.Repository
@@ -20,7 +21,8 @@ class CustomLectureRepository(
         major: String?,
         name: String,
         credit: Int?,
-        section: Section?
+        section: Section?,
+        pageable: Pageable
     ): Flux<Lecture> =
         query {
             "year" isEqualTo year
@@ -30,6 +32,7 @@ class CustomLectureRepository(
             "name" like name
             "credit" isEqualTo credit
             "section" isEqualTo section
+            paging(pageable)
         }.let {
             mongoTemplate.find(it, "lecture")
         }
