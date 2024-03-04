@@ -17,4 +17,13 @@ tasks {
     bootJar {
         enabled = true
     }
+
+    jib {
+        from {
+            image = "openjdk:17-oracle"
+        }
+        to {
+            image = "san06036/doyoumate-batch"
+        }
+    }
 }

@@ -5,6 +5,7 @@ plugins {
     id("java-library")
     id("java-test-fixtures")
     id("maven-publish")
+    id("com.google.cloud.tools.jib") version "3.3.1"
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
 }
@@ -33,6 +34,7 @@ subprojects {
         plugin("java-library")
         plugin("java-test-fixtures")
         plugin("maven-publish")
+        plugin("com.google.cloud.tools.jib")
     }
 
     configurations {
