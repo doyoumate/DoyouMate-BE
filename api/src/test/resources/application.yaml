@@ -1,4 +1,39 @@
+spring:
+  profiles:
+    include:
+      - domain
+      - common
+  main:
+    banner-mode: off
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:batch
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
 jwt:
   secretKey: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
   accessTokenExpire: 30
   refreshTokenExpire: 120
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  accessTokenExpire: ${JWT_ACCESS_EXPIRE}
+  refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  accessTokenExpire: ${JWT_ACCESS_EXPIRE}
+  refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
