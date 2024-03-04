@@ -24,13 +24,22 @@ tasks {
     bootJar {
         enabled = true
     }
-}
 
-openapi3 {
-    setServer("DoyouMate API Docs")
-    title = "DoyouMate API"
-    version = "v1"
-    format = "yaml"
-    outputFileNamePrefix = "api"
-    outputDirectory = "src/main/resources/static/docs"
+    jib {
+        from {
+            image = "openjdk:17-oracle"
+        }
+        to {
+            image = "san06036/doyoumate-api"
+        }
+    }
+
+    openapi3 {
+        setServer("DoyouMate API Docs")
+        title = "DoyouMate API"
+        version = "v1"
+        format = "yaml"
+        outputFileNamePrefix = "api"
+        outputDirectory = "src/main/resources/static/docs"
+    }
 }
