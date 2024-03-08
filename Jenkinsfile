@@ -74,7 +74,7 @@ pipeline {
                             sh('git config --global user.email "<>"')
                             sh('git config --global user.name "jenkins"')
                             sh('git add .')
-                            sh('git commit -m "Feat: Update image tag"')
+                            sh('git commit -m "Feat: Update image tags($tag)"')
                             sh('git push origin dev')
                         }
                     }
