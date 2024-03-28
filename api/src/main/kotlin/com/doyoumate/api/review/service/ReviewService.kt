@@ -4,7 +4,9 @@ import com.doyoumate.domain.auth.exception.PermissionDeniedException
 import com.doyoumate.domain.review.dto.request.CreateReviewRequest
 import com.doyoumate.domain.review.dto.request.UpdateReviewRequest
 import com.doyoumate.domain.review.dto.response.ReviewResponse
+import com.doyoumate.domain.review.exception.ReviewNotFoundException
 import com.doyoumate.domain.review.repository.ReviewRepository
+import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.JwtAuthentication
 import org.springframework.stereotype.Service
@@ -26,6 +28,7 @@ class ReviewService(
 
     fun createReview(request: CreateReviewRequest, authentication: JwtAuthentication): Mono<ReviewResponse> =
         studentRepository.findById(authentication.id)
+            .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .filter { request.lectureId in it.lectureIds }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { reviewRepository.save(request.toEntity()) }
@@ -37,6 +40,7 @@ class ReviewService(
         authentication: JwtAuthentication
     ): Mono<ReviewResponse> =
         reviewRepository.findById(id)
+            .switchIfEmpty(Mono.error(ReviewNotFoundException()))
             .filter { it.studentId == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { reviewRepository.save(request.updateEntity(it)) }
@@ -44,6 +48,7 @@ class ReviewService(
 
     fun deleteReviewById(id: String, authentication: JwtAuthentication): Mono<Void> =
         reviewRepository.findById(id)
+            .switchIfEmpty(Mono.error(ReviewNotFoundException()))
             .filter { it.studentId == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { reviewRepository.deleteById(id) }

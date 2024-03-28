@@ -8,12 +8,12 @@ import java.time.LocalDateTime
 @Document
 data class Post(
     @Id
-    val id: String,
+    val id: String? = null,
     val boardId: String,
     val writerId: String,
     val title: String,
     val content: String,
     val likedUserIds: List<String>,
     @CreatedDate
-    val createdDate: LocalDateTime
+    val createdDate: LocalDateTime = LocalDateTime.now()
 )
