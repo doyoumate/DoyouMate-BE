@@ -38,6 +38,8 @@ class SecurityConfiguration {
             authorizeExchange {
                 it.pathMatchers("/auth/**")
                     .permitAll()
+                    .pathMatchers("/admin/**")
+                    .hasRole("ADMIN")
                     .anyExchange()
                     .authenticated()
             }
