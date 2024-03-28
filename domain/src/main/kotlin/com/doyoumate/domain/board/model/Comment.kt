@@ -8,9 +8,10 @@ import java.time.LocalDateTime
 @Document
 data class Comment(
     @Id
-    val id: String,
+    val id: String? = null,
+    val postId: String,
     val writerId: String,
     val content: String,
     @CreatedDate
-    val createdDate: LocalDateTime
+    val createdDate: LocalDateTime = LocalDateTime.now()
 )
