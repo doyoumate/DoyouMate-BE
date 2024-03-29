@@ -13,7 +13,7 @@ data class Post(
     val writerId: String,
     val title: String,
     val content: String,
-    val likedUserIds: Set<String>,
+    val likedUserIds: HashSet<String> = hashSetOf(),
     @CreatedDate
     val createdDate: LocalDateTime = LocalDateTime.now()
 )

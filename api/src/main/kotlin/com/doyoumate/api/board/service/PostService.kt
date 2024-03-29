@@ -32,8 +32,7 @@ class PostService(
                     boardId = boardId,
                     writerId = authentication.id,
                     title = title,
-                    content = content,
-                    likedUserIds = emptySet(),
+                    content = content
                 )
             ).map { PostResponse(it) }
         }
@@ -65,7 +64,7 @@ class PostService(
                             add(authentication.id)
                         }
                     }
-                    .toSet()
+                    .toHashSet()
                 )
             }
             .flatMap { postRepository.save(it) }

@@ -31,8 +31,7 @@ class CommentService(
                 Comment(
                     postId = postId,
                     writerId = authentication.id,
-                    content = content,
-                    likedUserIds = emptySet()
+                    content = content
                 )
             ).map { CommentResponse(it) }
         }
@@ -68,7 +67,7 @@ class CommentService(
                             add(authentication.id)
                         }
                     }
-                    .toSet()
+                    .toHashSet()
                 )
             }
             .flatMap { commentRepository.save(it) }

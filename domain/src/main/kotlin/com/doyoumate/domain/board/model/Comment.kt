@@ -12,7 +12,7 @@ data class Comment(
     val postId: String,
     val writerId: String,
     val content: String,
-    val likedUserIds: Set<String>,
+    val likedUserIds: HashSet<String> = hashSetOf(),
     @CreatedDate
     val createdDate: LocalDateTime = LocalDateTime.now()
 )
