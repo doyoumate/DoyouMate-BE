@@ -17,6 +17,7 @@ class CommentRouter {
                 GET("/post/{postId}", handler::getCommentsByPostId)
                 POST("", handler::createComment)
                 PUT("/{id}", handler::updateCommentById)
+                PATCH("/{id}/like", handler::likeCommentById)
                 DELETE("/{id}", handler::deleteCommentById)
             }
         }
