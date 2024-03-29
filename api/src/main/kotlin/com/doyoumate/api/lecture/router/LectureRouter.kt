@@ -19,6 +19,7 @@ class LectureRouter {
                 GET("", queryParams("name", "page", "size"), handler::searchLectures)
                 GET("", queryParams("ids"), handler::getLecturesByIds)
                 GET("", handler::getLectures)
+                PATCH("/{id}/mark", handler::markLectureById)
             }
         }
 }
