@@ -34,6 +34,13 @@ class LectureService(
         lectureRepository.findAllByIdIn(ids)
             .map { LectureResponse(it) }
 
+    fun getMarkedLectures(authentication: JwtAuthentication): Flux<LectureResponse> =
+        markedLectureStudentRepository.findAllByStudentId(authentication.id)
+            .map { it.id!! }
+            .collectList()
+            .flatMapMany { lectureRepository.findAllByIdIn(it) }
+            .map { LectureResponse(it) }
+
     fun searchLectures(
         year: Int?,
         grade: Int?,
