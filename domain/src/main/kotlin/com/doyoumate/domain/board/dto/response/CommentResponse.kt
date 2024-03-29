@@ -8,6 +8,7 @@ data class CommentResponse(
     val postId: String,
     val writerId: String,
     val content: String,
+    val likedUserIds: Set<String>,
     val createdDate: LocalDateTime
 ) {
     companion object {
@@ -18,6 +19,7 @@ data class CommentResponse(
                     postId = postId,
                     writerId = writerId,
                     content = content,
+                    likedUserIds = likedUserIds,
                     createdDate = createdDate
                 )
             }
