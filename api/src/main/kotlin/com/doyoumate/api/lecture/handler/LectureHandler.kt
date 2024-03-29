@@ -1,5 +1,6 @@
 package com.doyoumate.api.lecture.handler
 
+import com.doyoumate.api.global.config.getAuthentication
 import com.doyoumate.api.lecture.service.LectureService
 import com.doyoumate.common.annotation.Handler
 import com.doyoumate.common.util.getQueryParam
@@ -47,4 +48,13 @@ class LectureHandler(
     fun getFilter(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(lectureService.getFilter())
+
+    fun markLectureById(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            getAuthentication()
+                .flatMap {
+                    ServerResponse.ok()
+                        .body(lectureService.markLectureById(pathVariable("id"), it))
+                }
+        }
 }
