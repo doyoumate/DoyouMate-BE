@@ -17,6 +17,7 @@ class PostRouter {
                 GET("/board/{boardId}", handler::getPostsByBoardId)
                 POST("", handler::createPost)
                 PUT("/{id}", handler::updatePostById)
+                PATCH("/{id}/like", handler::likePostById)
                 DELETE("/{id}", handler::deletePostById)
             }
         }
