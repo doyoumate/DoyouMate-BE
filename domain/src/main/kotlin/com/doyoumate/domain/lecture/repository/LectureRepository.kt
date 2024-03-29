@@ -5,10 +5,13 @@ import com.doyoumate.domain.lecture.model.Lecture
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Repository
 interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
+    fun findAllByIdIn(ids: List<String>): Flux<Lecture>
+
     @Aggregation(
         pipeline = [
             """
