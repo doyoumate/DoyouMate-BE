@@ -23,7 +23,7 @@ class LoggingAspect {
                     .defaultIfEmpty("")
                     .doOnNext {
                         logger.info {
-                            "HTTP ${request.method()} ${request.uri().run { "$path?$query" }} ${
+                            "HTTP ${request.method()} ${request.uri().run { "$path${query?.let { "?$it" } ?: ""}" }} ${
                                 it.replace(Regex("[ \\n]"), "")
                                     .replace(",", ", ")
                                     .trim()
