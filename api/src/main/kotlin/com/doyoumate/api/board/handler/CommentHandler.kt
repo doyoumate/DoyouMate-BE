@@ -57,4 +57,13 @@ class CommentHandler(
                         .body(commentService.deleteCommentById(pathVariable("id"), it))
                 }
         }
+
+    fun likeCommentById(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            getAuthentication()
+                .flatMap {
+                    ServerResponse.ok()
+                        .body(commentService.likeCommentById(pathVariable("id"), it))
+                }
+        }
 }

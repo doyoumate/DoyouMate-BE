@@ -33,7 +33,7 @@ class PostService(
                     writerId = authentication.id,
                     title = title,
                     content = content,
-                    likedUserIds = emptyList(),
+                    likedUserIds = emptySet(),
                 )
             ).map { PostResponse(it) }
         }
@@ -52,4 +52,22 @@ class PostService(
             .filter { it.writerId == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { postRepository.deleteById(id) }
+
+    fun likePostById(id: String, authentication: JwtAuthentication): Mono<PostResponse> =
+        postRepository.findById(id)
+            .switchIfEmpty(Mono.error(PostNotFoundException()))
+            .map {
+                it.copy(likedUserIds = it.likedUserIds.toMutableSet()
+                    .apply {
+                        if (authentication.id in it.likedUserIds) {
+                            remove(authentication.id)
+                        } else {
+                            add(authentication.id)
+                        }
+                    }
+                    .toSet()
+                )
+            }
+            .flatMap { postRepository.save(it) }
+            .map { PostResponse(it) }
 }

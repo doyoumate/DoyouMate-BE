@@ -31,7 +31,8 @@ class CommentService(
                 Comment(
                     postId = postId,
                     writerId = authentication.id,
-                    content = content
+                    content = content,
+                    likedUserIds = emptySet()
                 )
             ).map { CommentResponse(it) }
         }
@@ -54,4 +55,22 @@ class CommentService(
             .filter { it.writerId == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { commentRepository.deleteById(id) }
+
+    fun likeCommentById(id: String, authentication: JwtAuthentication): Mono<CommentResponse> =
+        commentRepository.findById(id)
+            .switchIfEmpty(Mono.error(CommentNotFoundException()))
+            .map {
+                it.copy(likedUserIds = it.likedUserIds.toMutableSet()
+                    .apply {
+                        if (authentication.id in it.likedUserIds) {
+                            remove(authentication.id)
+                        } else {
+                            add(authentication.id)
+                        }
+                    }
+                    .toSet()
+                )
+            }
+            .flatMap { commentRepository.save(it) }
+            .map { CommentResponse(it) }
 }

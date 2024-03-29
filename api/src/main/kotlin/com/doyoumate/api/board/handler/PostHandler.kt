@@ -51,4 +51,13 @@ class PostHandler(
                         .body(postService.deletePostById(pathVariable("id"), it))
                 }
         }
+
+    fun likePostById(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            getAuthentication()
+                .flatMap {
+                    ServerResponse.ok()
+                        .body(postService.likePostById(pathVariable("id"), it))
+                }
+        }
 }
