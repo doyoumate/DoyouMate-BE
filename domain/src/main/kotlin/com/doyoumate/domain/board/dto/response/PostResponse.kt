@@ -9,7 +9,7 @@ data class PostResponse(
     val writerId: String,
     val title: String,
     val content: String,
-    val likedUserIds: List<String>,
+    val likedUserIds: Set<String>,
     val createdDate: LocalDateTime
 ) {
     companion object {
