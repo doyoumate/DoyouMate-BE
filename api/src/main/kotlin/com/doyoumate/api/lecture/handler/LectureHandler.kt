@@ -23,6 +23,10 @@ class LectureHandler(
         ServerResponse.ok()
             .body(lectureService.getLectures())
 
+    fun getLecturesByIds(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(lectureService.getLecturesByIds(request.getQueryParam<String>("ids")!!.split(",")))
+
     fun searchLectures(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             ServerResponse.ok()
