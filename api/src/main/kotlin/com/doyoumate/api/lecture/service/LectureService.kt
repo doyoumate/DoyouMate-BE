@@ -26,6 +26,10 @@ class LectureService(
         lectureRepository.findAll()
             .map { LectureResponse(it) }
 
+    fun getLecturesByIds(ids: List<String>): Flux<LectureResponse> =
+        lectureRepository.findAllByIdIn(ids)
+            .map { LectureResponse(it) }
+
     fun searchLectures(
         year: Int?,
         grade: Int?,
