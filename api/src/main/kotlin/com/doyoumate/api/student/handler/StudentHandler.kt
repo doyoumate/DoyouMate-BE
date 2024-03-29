@@ -14,4 +14,12 @@ class StudentHandler(
     fun getStudentById(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(studentService.getStudentById(request.pathVariable("id")))
+
+    fun getAppliedStudentsByLectureId(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(studentService.getAppliedStudentsByLectureId(request.pathVariable("lectureId")))
+
+    fun getPreAppliedStudentsByLectureId(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(studentService.getPreAppliedStudentsByLectureId(request.pathVariable("lectureId")))
 }
