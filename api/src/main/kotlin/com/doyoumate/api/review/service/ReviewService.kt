@@ -29,7 +29,7 @@ class ReviewService(
     fun createReview(request: CreateReviewRequest, authentication: JwtAuthentication): Mono<ReviewResponse> =
         studentRepository.findById(authentication.id)
             .switchIfEmpty(Mono.error(StudentNotFoundException()))
-            .filter { request.lectureId in it.lectureIds }
+            .filter { request.lectureId in it.appliedLectureIds }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { reviewRepository.save(request.toEntity()) }
             .map { ReviewResponse(it) }
