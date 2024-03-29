@@ -17,6 +17,7 @@ class LectureRouter {
                 GET("/filter", handler::getFilter)
                 GET("/{id}", handler::getLectureById)
                 GET("", queryParams("name", "page", "size"), handler::searchLectures)
+                GET("", queryParams("ids"), handler::getLecturesByIds)
                 GET("", handler::getLectures)
             }
         }
