@@ -35,12 +35,21 @@ class SynchronizeStudentsTasklet(
             }
             ?.let {
                 studentClient.getStudentById(it)
-                    .zipWith(
-                        lectureClient.getAppliedLectureIdsByStudentId(it)
-                            .collectList()
-                    )
-                    .map { (student, lectureIds) ->
-                        student.copy(lectureIds = lectureIds.toHashSet())
+                    .filter { student -> !student.status.contains("제적") }
+                    .flatMap { student ->
+                        if (!(student.status.run { contains("휴학") || contains("졸업") })) {
+                            Mono.zip(
+                                lectureClient.getAppliedLectureIdsByStudentId(it)
+                                    .collectList(),
+                                lectureClient.getPreAppliedLectureIdsByStudentId(it)
+                                    .collectList()
+                            ).map { (appliedLectureIds, preAppliedLectureIds) ->
+                                student.copy(
+                                    appliedLectureIds = appliedLectureIds.toHashSet(),
+                                    preAppliedLectureIds = preAppliedLectureIds.toHashSet()
+                                )
+                            }
+                        } else Mono.just(student)
                     }
             }
 
