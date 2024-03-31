@@ -34,6 +34,6 @@ class CustomLectureRepository(
             "section" isEqualTo section
             paging(pageable)
         }.let {
-            mongoTemplate.find(it, "lecture")
+            mongoTemplate.find(it)
         }
 }
