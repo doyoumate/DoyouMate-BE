@@ -7,7 +7,7 @@ import com.doyoumate.common.util.component2
 import com.doyoumate.domain.lecture.adapter.LectureClient
 import com.doyoumate.domain.student.adapter.StudentClient
 import com.doyoumate.domain.student.model.Student
-import com.doyoumate.domain.student.repository.StudentRepository
+import com.doyoumate.domain.student.repository.CustomStudentRepository
 import org.springframework.batch.item.Chunk
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -15,7 +15,7 @@ import java.time.Year
 
 @Tasklet
 class SynchronizeStudentsTasklet(
-    private val studentRepository: StudentRepository,
+    private val customStudentRepository: CustomStudentRepository,
     private val studentClient: StudentClient,
     private val lectureClient: LectureClient
 ) : ItemTasklet<Mono<Student>> {
@@ -37,7 +37,9 @@ class SynchronizeStudentsTasklet(
                 studentClient.getStudentById(it)
                     .filter { student -> !student.status.contains("제적") }
                     .flatMap { student ->
-                        if (!(student.status.run { contains("휴학") || contains("졸업") })) {
+                        if (student.status.run { contains("휴학") || contains("졸업") }) {
+                            Mono.just(student)
+                        } else {
                             Mono.zip(
                                 lectureClient.getAppliedLectureIdsByStudentId(it)
                                     .collectList(),
@@ -49,12 +51,13 @@ class SynchronizeStudentsTasklet(
                                     preAppliedLectureIds = preAppliedLectureIds.toHashSet()
                                 )
                             }
-                        } else Mono.just(student)
+                        }
                     }
             }
 
     override fun write(chunk: Chunk<out Mono<Student>>) {
-        studentRepository.saveAll(Flux.concat(chunk.items))
+        Flux.concat(chunk.items)
+            .flatMap { customStudentRepository.updateStudent(it) }
             .collectList()
             .block()
     }
