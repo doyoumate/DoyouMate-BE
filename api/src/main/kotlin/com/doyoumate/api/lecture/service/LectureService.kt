@@ -55,11 +55,13 @@ class LectureService(
         studentRepository.findById(authentication.id)
             .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .map {
-                if (id in it.markedLecturesIds) {
-                    it.copy(markedLecturesIds = it.markedLecturesIds.apply { remove(id) })
-                } else {
-                    it.copy(markedLecturesIds = it.markedLecturesIds.apply { add(id) })
-                }
+                it.copy(markedLecturesIds = it.markedLecturesIds.apply {
+                    if (id in it.markedLecturesIds) {
+                        remove(id)
+                    } else {
+                        add(id)
+                    }
+                })
             }
             .flatMap { studentRepository.save(it) }
             .then()
