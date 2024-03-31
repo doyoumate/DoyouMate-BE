@@ -19,5 +19,6 @@ data class Student(
     val status: String,
     val gpa: Float?,
     val appliedLectureIds: HashSet<String> = hashSetOf(),
-    val preAppliedLectureIds: HashSet<String> = hashSetOf()
+    val preAppliedLectureIds: HashSet<String> = hashSetOf(),
+    val markedLecturesIds: HashSet<String> = hashSetOf()
 )

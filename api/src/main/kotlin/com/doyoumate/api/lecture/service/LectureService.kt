@@ -3,12 +3,12 @@ package com.doyoumate.api.lecture.service
 import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
 import com.doyoumate.domain.lecture.exception.LectureNotFoundException
-import com.doyoumate.domain.lecture.model.MarkedLectureStudent
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.lecture.repository.CustomLectureRepository
 import com.doyoumate.domain.lecture.repository.LectureRepository
-import com.doyoumate.domain.lecture.repository.MarkedLectureStudentRepository
+import com.doyoumate.domain.student.exception.StudentNotFoundException
+import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.JwtAuthentication
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono
 class LectureService(
     private val lectureRepository: LectureRepository,
     private val customLectureRepository: CustomLectureRepository,
-    private val markedLectureStudentRepository: MarkedLectureStudentRepository
+    private val studentRepository: StudentRepository
 ) {
     fun getLectureById(id: String): Mono<LectureResponse> =
         lectureRepository.findById(id)
@@ -32,13 +32,6 @@ class LectureService(
 
     fun getLecturesByIds(ids: List<String>): Flux<LectureResponse> =
         lectureRepository.findAllByIdIn(ids)
-            .map { LectureResponse(it) }
-
-    fun getMarkedLectures(authentication: JwtAuthentication): Flux<LectureResponse> =
-        markedLectureStudentRepository.findAllByStudentId(authentication.id)
-            .map { it.id!! }
-            .collectList()
-            .flatMapMany { lectureRepository.findAllByIdIn(it) }
             .map { LectureResponse(it) }
 
     fun searchLectures(
@@ -59,18 +52,15 @@ class LectureService(
             .map { FilterResponse(it) }
 
     fun markLectureById(id: String, authentication: JwtAuthentication): Mono<Void> =
-        markedLectureStudentRepository.findByLectureIdAndStudentId(id, authentication.id)
-            .flatMap {
-                markedLectureStudentRepository.deleteById(it.id!!)
-                    .thenReturn(true)
+        studentRepository.findById(authentication.id)
+            .switchIfEmpty(Mono.error(StudentNotFoundException()))
+            .map {
+                if (id in it.markedLecturesIds) {
+                    it.copy(markedLecturesIds = it.markedLecturesIds.apply { remove(id) })
+                } else {
+                    it.copy(markedLecturesIds = it.markedLecturesIds.apply { add(id) })
+                }
             }
-            .switchIfEmpty(Mono.defer {
-                markedLectureStudentRepository.save(
-                    MarkedLectureStudent(
-                        lectureId = id,
-                        studentId = authentication.id
-                    )
-                ).thenReturn(true)
-            })
+            .flatMap { studentRepository.save(it) }
             .then()
 }
