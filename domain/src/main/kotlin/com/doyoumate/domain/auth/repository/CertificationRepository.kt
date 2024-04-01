@@ -30,5 +30,9 @@ class CertificationRepository(
                 .thenReturn(this)
         }
 
+    fun deleteByStudentId(studentId: String): Mono<Boolean> =
+        redisTemplate.opsForValue()
+            .delete(studentId.toKey())
+
     private fun String.toKey(): String = "certification:$this"
 }
