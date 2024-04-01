@@ -73,8 +73,11 @@ class AuthenticationService(
                 .filter { it == certification }
                 .switchIfEmpty(Mono.error(InvalidCertificationException()))
                 .flatMap {
-                    studentRepository.findById(certification.studentId)
-                        .flatMap { studentRepository.save(it.copy(password = passwordEncoder.encode(password))) }
+                    Mono.zip(
+                        studentRepository.findById(certification.studentId)
+                            .flatMap { studentRepository.save(it.copy(password = passwordEncoder.encode(password))) },
+                        certificationRepository.deleteByStudentId(certification.studentId)
+                    )
                 }
                 .then()
         }
