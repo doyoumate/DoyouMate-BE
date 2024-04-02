@@ -1,5 +1,6 @@
 package com.doyoumate.api.student.handler
 
+import com.doyoumate.api.global.config.getAuthentication
 import com.doyoumate.api.student.service.StudentService
 import com.doyoumate.common.annotation.Handler
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -11,9 +12,12 @@ import reactor.core.publisher.Mono
 class StudentHandler(
     private val studentService: StudentService
 ) {
-    fun getStudentById(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(studentService.getStudentById(request.pathVariable("id")))
+    fun getStudent(request: ServerRequest): Mono<ServerResponse> =
+        request.getAuthentication()
+            .flatMap {
+                ServerResponse.ok()
+                    .body(studentService.getStudentById(it.id))
+            }
 
     fun getAppliedStudentsByLectureId(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
