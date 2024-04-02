@@ -40,7 +40,7 @@ class LectureHandler(
                         getQueryParam("name")!!,
                         getQueryParam("credit"),
                         getQueryParam<String>("section")?.let { Section(it) },
-                        PageRequest.of(getQueryParam<Int>("page")!!, getQueryParam<Int>("size")!!)
+                        PageRequest.of(getQueryParam("page")!!, getQueryParam("size")!!)
                     )
                 )
         }
