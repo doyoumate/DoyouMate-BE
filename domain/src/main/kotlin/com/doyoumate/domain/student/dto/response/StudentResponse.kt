@@ -14,7 +14,8 @@ data class StudentResponse(
     val status: String,
     val gpa: Float?,
     val appliedLectureIds: HashSet<String>,
-    val preAppliedLectureIds: HashSet<String>
+    val preAppliedLectureIds: HashSet<String>,
+    val markedLectureIds: HashSet<String>
 ) {
     companion object {
         operator fun invoke(student: Student): StudentResponse =
@@ -30,7 +31,8 @@ data class StudentResponse(
                     status = status,
                     gpa = gpa,
                     appliedLectureIds = appliedLectureIds,
-                    preAppliedLectureIds = preAppliedLectureIds
+                    preAppliedLectureIds = preAppliedLectureIds,
+                    markedLectureIds = markedLecturesIds
                 )
             }
     }
