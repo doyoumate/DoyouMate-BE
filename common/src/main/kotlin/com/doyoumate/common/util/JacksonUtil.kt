@@ -12,13 +12,14 @@ inline fun <reified T> JsonNode.getValue(key: String): T =
         .get("value")
         .toString()
         .replace("\"", "")
-        .let {
-            when (T::class) {
-                Int::class -> it.toInt()
-                Long::class -> it.toLong()
-                Float::class -> it.toFloat()
-                Double::class -> it.toDouble()
-                else -> it
+        .run {
+            when(T::class) {
+                String::class -> this
+                Int::class -> toInt()
+                Long::class -> toLong()
+                Float::class -> toFloat()
+                Double::class -> toDouble()
+                else -> this
             } as T
         }
 
