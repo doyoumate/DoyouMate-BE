@@ -15,7 +15,7 @@ class StudentRouter {
             "/student".nest {
                 GET("/applied/lectureId/{lectureId}", handler::getAppliedStudentsByLectureId)
                 GET("/pre-applied/lectureId/{lectureId}", handler::getPreAppliedStudentsByLectureId)
-                GET("/{id}", handler::getStudentById)
+                GET("/me", handler::getStudent)
             }
         }
 }
