@@ -114,4 +114,34 @@ class StudentClient(
             it.get("ROW")
                 .getValue("MBPHON_NO")
         }
+
+    private fun getRankById(id: String): Mono<Int> =
+        LocalDate.now()
+            .let {
+                if (it.monthValue > 7) {
+                    it.year to Semester.FIRST
+                } else {
+                    it.year - 1 to Semester.SECOND
+                }
+            }
+            .let { (year, semester) ->
+                """
+                    <rqM0_F0 task="system.commonTask" action="comSelect" xda="academic.ag.ag02.ag02_20060206_m_M0_F0_xda" con="sudev"> 
+            	        <FCLT_GSCH_DIV_CD value="1"/>
+            	        <YY value="$year"/> 
+            	        <SHTM_CD value="${semester.id}"/> 
+            	        <STUNO value="$id"/>
+                    </rqM0_F0>
+                """
+            }.let {
+                webClient.post()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_XML)
+                    .bodyValue(it)
+                    .retrieve()
+                    .bodyToMono<String>()
+            }
+            .flatMap { xmlMapper.getRow(it) }
+            .filter { it.getValue<String>("MJR_RANK").isNotBlank() }
+            .map { it.getValue("MJR_RANK") }
 }
