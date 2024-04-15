@@ -90,7 +90,12 @@ class AuthenticationService(
                 .switchIfEmpty(Mono.error(AccountNotFoundException()))
                 .filter { passwordEncoder.matches(password, it.password) }
                 .switchIfEmpty(Mono.error(PasswordNotMatchedException()))
-                .map { JwtAuthentication(id = it.id, authorities = setOf(SimpleGrantedAuthority("USER"))) }
+                .map {
+                    JwtAuthentication(
+                        id = it.id,
+                        authorities = setOf(SimpleGrantedAuthority(it.role.name))
+                    )
+                }
                 .map {
                     LoginResponse(
                         accessToken = jwtProvider.createAccessToken(it),
