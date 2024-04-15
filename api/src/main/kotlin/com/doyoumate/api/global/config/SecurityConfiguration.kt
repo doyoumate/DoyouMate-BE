@@ -1,5 +1,6 @@
 package com.doyoumate.api.global.config
 
+import com.doyoumate.domain.student.model.enum.Role
 import com.github.jwt.core.JwtProvider
 import com.github.jwt.security.JwtAuthentication
 import com.github.jwt.security.ReactiveJwtFilter
@@ -39,7 +40,7 @@ class SecurityConfiguration {
                 it.pathMatchers("/auth/**")
                     .permitAll()
                     .pathMatchers("/admin/**")
-                    .hasRole("ADMIN")
+                    .hasAuthority(Role.ADMIN.name)
                     .anyExchange()
                     .authenticated()
             }
