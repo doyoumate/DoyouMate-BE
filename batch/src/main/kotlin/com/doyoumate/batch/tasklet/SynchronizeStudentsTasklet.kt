@@ -35,7 +35,6 @@ class SynchronizeStudentsTasklet(
             }
             ?.let {
                 studentClient.getStudentById(it)
-                    .filter { student -> !student.status.contains("제적") }
                     .flatMap { student ->
                         if (student.status.run { contains("휴학") || contains("졸업") }) {
                             Mono.just(student)
