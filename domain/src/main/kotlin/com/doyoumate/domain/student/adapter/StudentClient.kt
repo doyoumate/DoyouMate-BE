@@ -6,6 +6,7 @@ import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.student.model.Student
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -16,30 +17,39 @@ import java.time.format.DateTimeFormatter
 @Client
 class StudentClient(
     private val webClient: WebClient,
-    private val xmlMapper: XmlMapper
+    private val xmlMapper: XmlMapper,
+    @Value("\${api.uri}")
+    private val uri: String
 ) {
     fun getStudentById(id: String): Mono<Student> =
-        Mono.zip(
-            getProfileById(id),
-            getPhoneNumberById(id)
-                .defaultIfEmpty(""),
-            getGpaById(id)
-                .defaultIfEmpty(0.0f)
-        ).map { (profile, phoneNumber, gpa) ->
-            profile.run {
-                Student(
-                    id = getValue("STUNO"),
-                    name = getValue("FNM"),
-                    birthDate = LocalDate.parse(getValue("BIRYMD"), DateTimeFormatter.ofPattern("yyyyMMdd")),
-                    phoneNumber = phoneNumber.ifBlank { null },
-                    major = getValue("FCLT_NM"),
-                    grade = getValue("NOW_SHYS_CD"),
-                    semester = Semester(getValue<Int>("NOW_SHTM_CD")),
-                    status = "${getValue<String>("SCHREG_STAT_CHANGE_NM")}(${getValue<String>("SCHREG_CHANGE_DTL_NM")})",
-                    gpa = gpa.takeIf { it != 0.0f }
+        getProfileById(id)
+            .filter { it.getValue<String>("SCHREG_STAT_CHANGE_NM") != "제적" }
+            .flatMap {
+                Mono.zip(
+                    Mono.just(it),
+                    getPhoneNumberById(id),
+                    getGpaById(id)
+                        .defaultIfEmpty(0.0f),
+                    getRankById(id)
+                        .defaultIfEmpty(0)
                 )
             }
-        }
+            .map { (profile, phoneNumber, gpa, rank) ->
+                profile.run {
+                    Student(
+                        id = getValue("STUNO"),
+                        name = getValue("FNM"),
+                        birthDate = LocalDate.parse(getValue("BIRYMD"), DateTimeFormatter.ofPattern("yyyyMMdd")),
+                        phoneNumber = phoneNumber,
+                        major = getValue("FCLT_NM"),
+                        grade = getValue("NOW_SHYS_CD"),
+                        semester = Semester(getValue<Int>("NOW_SHTM_CD")),
+                        status = "${getValue<String>("SCHREG_STAT_CHANGE_NM")}(${getValue<String>("SCHREG_CHANGE_DTL_NM")})",
+                        gpa = gpa.takeIf { it != 0.0f },
+                        rank = rank.takeIf { it != 0 }
+                    )
+                }
+            }
 
     private fun getProfileById(id: String): Mono<JsonNode> =
         LocalDate.now()
@@ -56,17 +66,13 @@ class StudentClient(
             }
             .let {
                 webClient.post()
-                    .uri("https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp")
+                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
                     .bodyToMono<String>()
             }
-            .mapOrEmpty {
-                xmlMapper.readTree(it)
-                    .findValue("data")
-                    ?.get("ROW")
-            }
+            .flatMap { xmlMapper.getRow(it) }
 
     private fun getGpaById(id: String): Mono<Float> =
         LocalDate.now()
@@ -82,7 +88,7 @@ class StudentClient(
             }
             .let {
                 webClient.post()
-                    .uri("https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp")
+                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
@@ -92,8 +98,7 @@ class StudentClient(
                 xmlMapper.getRow(it)
             }
             .map {
-                it.get("ROW")
-                    .getValue<Float>("TOT_AVG_AVRP")
+                it.getValue<Float>("TOT_AVG_AVRP")
             }
 
     private fun getPhoneNumberById(id: String): Mono<String> =
@@ -103,7 +108,7 @@ class StudentClient(
             </rqM0_F0>
         """.let {
             webClient.post()
-                .uri("https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp")
+                .uri(uri)
                 .contentType(MediaType.APPLICATION_XML)
                 .bodyValue(it)
                 .retrieve()
@@ -111,8 +116,7 @@ class StudentClient(
         }.flatMap {
             xmlMapper.getRow(it)
         }.map {
-            it.get("ROW")
-                .getValue("MBPHON_NO")
+            it.getValue("MBPHON_NO")
         }
 
     private fun getRankById(id: String): Mono<Int> =
