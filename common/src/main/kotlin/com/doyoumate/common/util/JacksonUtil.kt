@@ -26,10 +26,13 @@ inline fun <reified T> JsonNode.getValue(key: String): T =
 fun XmlMapper.getRows(xml: String): Flux<JsonNode> =
     readTree(xml)
         .findValue("data")
-        ?.run { if (isArray) toFlux() else Flux.just(this) } ?: Flux.empty()
+        ?.run { if (isArray) toFlux() else Flux.just(this) }
+        ?.map { it.get("ROW") }
+        ?: Flux.empty()
 
 fun XmlMapper.getRow(xml: String): Mono<JsonNode> =
     readTree(xml)
         .findValue("data")
         ?.run { if (isArray) first() else this }
         .toMono()
+        .map { it.get("ROW") }
