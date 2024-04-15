@@ -1,6 +1,7 @@
 package com.doyoumate.domain.student.model
 
 import com.doyoumate.domain.lecture.model.enum.Semester
+import com.doyoumate.domain.student.model.enum.Role
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
@@ -19,6 +20,7 @@ data class Student(
     val status: String,
     val gpa: Float?,
     val rank: Int?,
+    val role: Role = Role.USER,
     val appliedLectureIds: HashSet<String> = hashSetOf(),
     val preAppliedLectureIds: HashSet<String> = hashSetOf(),
     val markedLecturesIds: HashSet<String> = hashSetOf()
