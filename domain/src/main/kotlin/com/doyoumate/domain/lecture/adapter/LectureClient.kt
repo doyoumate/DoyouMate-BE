@@ -39,25 +39,24 @@ class LectureClient(
         }.flatMapMany {
             xmlMapper.getRows(it)
         }.map {
-            it.get("ROW")
-                .run {
-                    Lecture(
-                        id = getValue("LECT_NO"),
-                        courseNumber = getValue("EDUCUR_CORS_NO"),
-                        code = getValue("SBJT_CD"),
-                        year = getValue("OPEN_YY"),
-                        grade = getValue("EDUCUR_CORS_SHYS_CD"),
-                        semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
-                        major = getValue("ORGN4_NM"),
-                        name = getValue("SBJT_NM"),
-                        professor = getValue("FNM"),
-                        room = getValue("LT_ROOM_NM"),
-                        date = getValue("LTTM"),
-                        credit = getValue("LCTPT"),
-                        section = getValue<String>("CTNCCH_FLD_DIV_CD")
-                            .run { if (isBlank()) null else Section(toInt()) }
-                    )
-                }
+            it.run {
+                Lecture(
+                    id = getValue("LECT_NO"),
+                    courseNumber = getValue("EDUCUR_CORS_NO"),
+                    code = getValue("SBJT_CD"),
+                    year = getValue("OPEN_YY"),
+                    grade = getValue("EDUCUR_CORS_SHYS_CD"),
+                    semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
+                    major = getValue("ORGN4_NM"),
+                    name = getValue("SBJT_NM"),
+                    professor = getValue("FNM"),
+                    room = getValue("LT_ROOM_NM"),
+                    date = getValue("LTTM"),
+                    credit = getValue("LCTPT"),
+                    section = getValue<String>("CTNCCH_FLD_DIV_CD")
+                        .run { if (isBlank()) null else Section(toInt()) }
+                )
+            }
         }
 
     fun getAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
@@ -82,9 +81,9 @@ class LectureClient(
             }
             .flatMapMany {
                 xmlMapper.getRows(it)
-            }.map {
-                it.get("ROW")
-                    .getValue("LECT_NO")
+            }
+            .map {
+                it.getValue("LECT_NO")
             }
 
     fun getPreAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
@@ -110,7 +109,6 @@ class LectureClient(
             .flatMapMany {
                 xmlMapper.getRows(it)
             }.map {
-                it.get("ROW")
-                    .getValue("LECT_NO")
+                it.getValue("LECT_NO")
             }
 }

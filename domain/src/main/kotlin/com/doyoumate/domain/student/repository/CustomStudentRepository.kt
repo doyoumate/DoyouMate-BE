@@ -27,6 +27,7 @@ class CustomStudentRepository(
                 "semester" set semester
                 "status" set status
                 "gpa" set gpa
+                "rank" set rank
                 "appliedLectureIds" set appliedLectureIds
                 "preAppliedLectureIds" set preAppliedLectureIds
                 "markedLectureIds" setOnInsert hashSetOf<String>()

@@ -13,6 +13,7 @@ data class StudentResponse(
     val semester: String,
     val status: String,
     val gpa: Float?,
+    val rank: Int?,
     val appliedLectureIds: HashSet<String>,
     val preAppliedLectureIds: HashSet<String>,
     val markedLectureIds: HashSet<String>
@@ -30,6 +31,7 @@ data class StudentResponse(
                     semester = semester.semesterName,
                     status = status,
                     gpa = gpa,
+                    rank = rank,
                     appliedLectureIds = appliedLectureIds,
                     preAppliedLectureIds = preAppliedLectureIds,
                     markedLectureIds = markedLecturesIds
