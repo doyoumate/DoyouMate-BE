@@ -10,14 +10,14 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
-  batch:
-    job:
-      enabled: false
 ---
 spring:
   config:
     activate:
       on-profile: local
+  batch:
+    job:
+      name: ${job}
 jwt:
   secretKey: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
   accessTokenExpire: 30
