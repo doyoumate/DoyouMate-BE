@@ -4,8 +4,6 @@ import com.doyoumate.domain.lecture.model.Lecture
 
 data class LectureResponse(
     val id: String,
-    val courseNumber: String,
-    val code: String,
     val year: Int,
     val grade: Int,
     val semester: String,
@@ -22,8 +20,6 @@ data class LectureResponse(
             with(lecture) {
                 LectureResponse(
                     id = id,
-                    courseNumber = courseNumber,
-                    code = code,
                     year = year,
                     grade = grade,
                     semester = semester.semesterName,

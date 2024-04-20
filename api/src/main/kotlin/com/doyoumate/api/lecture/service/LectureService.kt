@@ -2,7 +2,6 @@ package com.doyoumate.api.lecture.service
 
 import com.doyoumate.domain.lecture.dto.response.FilterResponse
 import com.doyoumate.domain.lecture.dto.response.LectureResponse
-import com.doyoumate.domain.lecture.exception.LectureNotFoundException
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.lecture.repository.CustomLectureRepository
@@ -21,15 +20,6 @@ class LectureService(
     private val customLectureRepository: CustomLectureRepository,
     private val studentRepository: StudentRepository
 ) {
-    fun getLectureById(id: String): Mono<LectureResponse> =
-        lectureRepository.findById(id)
-            .switchIfEmpty(Mono.error(LectureNotFoundException()))
-            .map { LectureResponse(it) }
-
-    fun getLectures(): Flux<LectureResponse> =
-        lectureRepository.findAll()
-            .map { LectureResponse(it) }
-
     fun getLecturesByIds(ids: List<String>): Flux<LectureResponse> =
         lectureRepository.findAllByIdIn(ids)
             .map { LectureResponse(it) }
@@ -44,7 +34,7 @@ class LectureService(
         section: Section?,
         pageable: Pageable
     ): Flux<LectureResponse> =
-        customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section, pageable)
+        customLectureRepository.search(year, grade, semester, major, name, credit, section, pageable)
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =

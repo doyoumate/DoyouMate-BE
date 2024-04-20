@@ -14,10 +14,6 @@ import reactor.core.publisher.Mono
 class BoardHandler(
     private val boardService: BoardService
 ) {
-    fun getBoardById(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(boardService.getBoardById(request.pathVariable("id")))
-
     fun getBoards(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(boardService.getBoards())
