@@ -17,17 +17,17 @@ import java.time.Year
 class SynchronizeStudentsTasklet(
     private val customStudentRepository: CustomStudentRepository,
     private val studentClient: StudentClient,
-    private val lectureClient: LectureClient
+    private val lectureClient: LectureClient,
 ) : ItemTasklet<Mono<Student>> {
     private val years = (2018..Year.now().value).toList()
     private var number = 100000
-    private var idx = 0
+    private var index = 0
 
     override fun read(): Mono<Student>? =
-        years.getOrNull(idx)
+        years.getOrNull(index)
             ?.let { year ->
                 if (number >= 102000) {
-                    idx += 1
+                    index += 1
                     number = 100000
                 }
 
@@ -56,7 +56,7 @@ class SynchronizeStudentsTasklet(
 
     override fun write(chunk: Chunk<out Mono<Student>>) {
         Flux.concat(chunk.items)
-            .flatMap { customStudentRepository.updateStudent(it) }
+            .flatMap { customStudentRepository.upsert(it) }
             .collectList()
             .block()
     }

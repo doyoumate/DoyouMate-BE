@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 class CustomStudentRepository(
     private val mongoTemplate: ReactiveMongoTemplate
 ) {
-    fun updateStudent(student: Student): Mono<Student> =
+    fun upsert(student: Student): Mono<Student> =
         with(student) {
             val query = query {
                 "id" isEqualTo id
@@ -28,6 +28,7 @@ class CustomStudentRepository(
                 "status" set status
                 "gpa" set gpa
                 "rank" set rank
+                "role" setOnInsert role
                 "appliedLectureIds" set appliedLectureIds
                 "preAppliedLectureIds" set preAppliedLectureIds
                 "markedLectureIds" setOnInsert hashSetOf<String>()

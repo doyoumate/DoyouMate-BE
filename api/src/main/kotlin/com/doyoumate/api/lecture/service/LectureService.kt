@@ -34,7 +34,7 @@ class LectureService(
         section: Section?,
         pageable: Pageable
     ): Flux<LectureResponse> =
-        customLectureRepository.searchLectures(year, grade, semester, major, name, credit, section, pageable)
+        customLectureRepository.search(year, grade, semester, major, name, credit, section, pageable)
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =

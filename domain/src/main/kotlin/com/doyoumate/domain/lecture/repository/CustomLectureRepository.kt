@@ -14,7 +14,7 @@ import reactor.core.publisher.Flux
 class CustomLectureRepository(
     private val mongoTemplate: ReactiveMongoTemplate
 ) {
-    fun searchLectures(
+    fun search(
         year: Int?,
         grade: Int?,
         semester: Semester?,

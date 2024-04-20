@@ -22,10 +22,10 @@ class SynchronizeLecturesTasklet(
             year to semester
         }
     }
-    private var idx = 0
+    private var index = 0
 
     override fun read(): Flux<Lecture>? =
-        pairs.getOrNull(idx++)
+        pairs.getOrNull(index++)
             ?.let { (year, semester) -> lectureClient.getLecturesByYearAndSemester(year, semester) }
 
     override fun write(chunk: Chunk<out Flux<Lecture>>) {
