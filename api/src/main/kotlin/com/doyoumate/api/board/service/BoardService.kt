@@ -13,11 +13,6 @@ import reactor.core.publisher.Mono
 class BoardService(
     private val boardRepository: BoardRepository
 ) {
-    fun getBoardById(id: String): Mono<BoardResponse> =
-        boardRepository.findById(id)
-            .switchIfEmpty(Mono.error(BoardNotFoundException()))
-            .map { BoardResponse(it) }
-
     fun getBoards(): Flux<BoardResponse> =
         boardRepository.findAll()
             .map { BoardResponse(it) }

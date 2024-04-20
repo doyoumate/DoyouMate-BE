@@ -16,15 +16,6 @@ import reactor.core.publisher.Mono
 class CommentService(
     private val commentRepository: CommentRepository
 ) {
-    fun getCommentById(id: String): Mono<CommentResponse> =
-        commentRepository.findById(id)
-            .switchIfEmpty(Mono.error(CommentNotFoundException()))
-            .map { CommentResponse(it) }
-
-    fun getCommentsByPostId(postId: String): Flux<CommentResponse> =
-        commentRepository.findAllByPostId(postId)
-            .map { CommentResponse(it) }
-
     fun createComment(request: CreateCommentRequest, authentication: JwtAuthentication): Mono<CommentResponse> =
         with(request) {
             commentRepository.save(

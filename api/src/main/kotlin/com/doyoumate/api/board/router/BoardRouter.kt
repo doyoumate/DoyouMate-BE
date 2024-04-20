@@ -13,7 +13,6 @@ class BoardRouter {
     fun boardRoutes(handler: BoardHandler): RouterFunction<ServerResponse> =
         router {
             "/board".nest {
-                GET("/{id}", handler::getBoardById)
                 GET("", handler::getBoards)
             }
 

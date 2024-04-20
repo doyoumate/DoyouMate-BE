@@ -16,14 +16,6 @@ import reactor.core.publisher.Mono
 class LectureHandler(
     private val lectureService: LectureService
 ) {
-    fun getLectureById(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(lectureService.getLectureById(request.pathVariable("id")))
-
-    fun getLectures(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(lectureService.getLectures())
-
     fun getLecturesByIds(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(lectureService.getLecturesByIds(request.getQueryParam<String>("ids")!!.split(",")))
