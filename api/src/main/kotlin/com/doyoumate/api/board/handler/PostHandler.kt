@@ -4,8 +4,10 @@ import com.doyoumate.api.board.service.PostService
 import com.doyoumate.api.global.config.getAuthentication
 import com.doyoumate.common.annotation.Handler
 import com.doyoumate.common.util.component1
+import com.doyoumate.common.util.getQueryParam
 import com.doyoumate.domain.board.dto.request.CreatePostRequest
 import com.doyoumate.domain.board.dto.request.UpdatePostRequest
+import org.springframework.data.domain.PageRequest
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
@@ -17,13 +19,17 @@ import reactor.kotlin.core.util.function.component2
 class PostHandler(
     private val postService: PostService
 ) {
-    fun getPostById(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(postService.getPostById(request.pathVariable("id")))
-
-    fun getPostsByBoardId(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(postService.getPostsByBoardId(request.pathVariable("boardId")))
+    fun searchPosts(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            ServerResponse.ok()
+                .body(
+                    postService.searchPosts(
+                        getQueryParam("boardId"),
+                        getQueryParam("content")!!,
+                        PageRequest.of(getQueryParam("page")!!, getQueryParam("size")!!)
+                    )
+                )
+        }
 
     fun createPost(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
