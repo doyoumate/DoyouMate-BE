@@ -1,6 +1,7 @@
 package com.doyoumate.domain.global.util
 
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
@@ -29,6 +30,10 @@ class QueryDsl {
         value?.let {
             query.addCriteria(where(this).regex(value, "i"))
         }
+    }
+
+    infix fun String.sortBy(direction: Sort.Direction) {
+        query.with(Sort.by(direction, this))
     }
 
     fun paging(pageable: Pageable) {
