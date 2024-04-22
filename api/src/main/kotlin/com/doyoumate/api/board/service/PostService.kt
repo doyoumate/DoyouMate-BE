@@ -25,6 +25,10 @@ class PostService(
     private val studentRepository: StudentRepository,
     private val boardRepository: BoardRepository,
 ) {
+    fun getPopularPosts(): Flux<PostResponse> =
+        postRepository.findTop2OrderByLikedUserIdsSize()
+            .map { PostResponse(it) }
+
     fun searchPosts(boardId: String?, content: String, pageable: Pageable): Flux<PostResponse> =
         customPostRepository.search(boardId, content, pageable)
             .map { PostResponse(it) }
