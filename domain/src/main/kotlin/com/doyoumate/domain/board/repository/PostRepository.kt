@@ -1,6 +1,7 @@
 package com.doyoumate.domain.board.repository
 
 import com.doyoumate.domain.board.model.Post
+import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
@@ -13,4 +14,13 @@ interface PostRepository : ReactiveMongoRepository<Post, String> {
 
     @Query("{ 'writer.id' : ?0 }")
     fun findAllByWriterId(writerId: String): Flux<Post>
+
+    @Aggregation(
+        pipeline = [
+            "{ \$addFields: { count: { \$size: '\$likedUserIds' } }}",
+            "{ \$sort: { count: -1 } }",
+            "{ \$limit: 2 }"
+        ]
+    )
+    fun findTop2OrderByLikedUserIdsSize(): Flux<Post>
 }
