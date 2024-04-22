@@ -15,6 +15,7 @@ class PostRouter {
         router {
             "/post".nest {
                 GET("", queryParams("content", "page", "size"), handler::searchPosts)
+                GET("/popular", handler::getPopularPosts)
                 POST("", handler::createPost)
                 PUT("/{id}", handler::updatePostById)
                 PATCH("/{id}/like", handler::likePostById)
