@@ -19,6 +19,10 @@ import reactor.kotlin.core.util.function.component2
 class PostHandler(
     private val postService: PostService
 ) {
+    fun getPopularPosts(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(postService.getPopularPosts())
+
     fun searchPosts(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             ServerResponse.ok()
