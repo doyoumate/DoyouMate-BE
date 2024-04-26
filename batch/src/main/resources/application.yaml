@@ -17,7 +17,7 @@ spring:
       on-profile: local
   batch:
     job:
-      name: ${job}
+      name: ${JOB}
 jwt:
   secretKey: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
   accessTokenExpire: 30
@@ -27,6 +27,9 @@ spring:
   config:
     activate:
       on-profile: dev
+  batch:
+    job:
+      name: ${JOB}
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
@@ -36,6 +39,9 @@ spring:
   config:
     activate:
       on-profile: prod
+  batch:
+    job:
+      name: ${JOB}
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
