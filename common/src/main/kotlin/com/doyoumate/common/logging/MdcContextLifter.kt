@@ -5,7 +5,9 @@ import org.slf4j.MDC
 import reactor.core.CoreSubscriber
 import reactor.util.context.Context
 
-class MdcContextLifter<T>(private val coreSubscriber: CoreSubscriber<T>) : CoreSubscriber<T> {
+class MdcContextLifter<T>(
+    private val coreSubscriber: CoreSubscriber<T>
+) : CoreSubscriber<T> {
     override fun onSubscribe(subscription: Subscription) {
         coreSubscriber.onSubscribe(subscription)
     }
