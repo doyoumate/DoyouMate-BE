@@ -32,10 +32,9 @@ pipeline {
             }
         }
 
-//         stage('Test and create document') {
+//         stage('Test and create API specification') {
 //             steps {
-//                 sh 'mkdir ./api/src/main/resources/static'
-//                 sh 'mkdir ./api/src/main/resources/static/docs'
+//                 sh 'mkdir -p ./api/src/main/resources/static/docs'
 //
 //                 sh './gradlew test'
 //             }
@@ -58,7 +57,7 @@ pipeline {
                     script {
                         dir('helm') {
                             git(
-                                url: 'https://github.com/doyoumate/Helm.git',
+                                url: 'https://github.com/doyoumate/DoyouMate-Chart.git',
                                 branch: 'dev',
                                 credentialsId: 'git'
                             )
