@@ -6,7 +6,6 @@ import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.student.model.Student
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -18,8 +17,6 @@ import java.time.format.DateTimeFormatter
 class StudentClient(
     private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
-    @Value("\${api.uri}")
-    private val uri: String
 ) {
     fun getStudentById(id: String): Mono<Student> =
         getProfileById(id)
@@ -66,7 +63,6 @@ class StudentClient(
             }
             .let {
                 webClient.post()
-                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
@@ -88,7 +84,6 @@ class StudentClient(
             }
             .let {
                 webClient.post()
-                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
@@ -108,7 +103,6 @@ class StudentClient(
             </rqM0_F0>
         """.let {
             webClient.post()
-                .uri(uri)
                 .contentType(MediaType.APPLICATION_XML)
                 .bodyValue(it)
                 .retrieve()
@@ -139,7 +133,6 @@ class StudentClient(
                 """
             }.let {
                 webClient.post()
-                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()

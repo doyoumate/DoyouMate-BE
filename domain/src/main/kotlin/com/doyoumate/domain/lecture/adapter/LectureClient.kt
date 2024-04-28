@@ -7,7 +7,6 @@ import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -17,9 +16,7 @@ import java.time.LocalDate
 @Client
 class LectureClient(
     private val webClient: WebClient,
-    private val xmlMapper: XmlMapper,
-    @Value("\${api.uri}")
-    private val uri: String
+    private val xmlMapper: XmlMapper
 ) {
     fun getLecturesByYearAndSemester(year: Int, semester: Semester): Flux<Lecture> =
         """
@@ -31,7 +28,6 @@ class LectureClient(
             </rqM0_F0>
         """.let {
             webClient.post()
-                .uri(uri)
                 .contentType(MediaType.APPLICATION_XML)
                 .bodyValue(it)
                 .retrieve()
@@ -71,7 +67,6 @@ class LectureClient(
             }
             .let {
                 webClient.post()
-                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
@@ -98,7 +93,6 @@ class LectureClient(
             }
             .let {
                 webClient.post()
-                    .uri(uri)
                     .contentType(MediaType.APPLICATION_XML)
                     .bodyValue(it)
                     .retrieve()
