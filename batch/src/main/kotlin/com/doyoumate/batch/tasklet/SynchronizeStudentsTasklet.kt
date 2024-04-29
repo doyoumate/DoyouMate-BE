@@ -4,6 +4,7 @@ import com.doyoumate.batch.annotation.Tasklet
 import com.doyoumate.batch.util.ItemTasklet
 import com.doyoumate.common.util.component1
 import com.doyoumate.common.util.component2
+import com.doyoumate.common.util.getLogger
 import com.doyoumate.domain.lecture.adapter.LectureClient
 import com.doyoumate.domain.student.adapter.StudentClient
 import com.doyoumate.domain.student.model.Student
@@ -18,6 +19,7 @@ class SynchronizeStudentsTasklet(
     private val studentClient: StudentClient,
     private val lectureClient: LectureClient,
 ) : ItemTasklet<Mono<Student>> {
+    private val logger = getLogger()
     private val years = (2018..Year.now().value).toList()
     private var number = 100000
     private var index = 0
@@ -54,9 +56,10 @@ class SynchronizeStudentsTasklet(
             }
 
     override fun write(chunk: Chunk<out Mono<Student>>) {
-        Flux.concat(chunk.items)
+        chunk.items
+            .first()
             .flatMap { customStudentRepository.upsert(it) }
-            .collectList()
+            .doOnNext { logger.info { it } }
             .block()
     }
 }

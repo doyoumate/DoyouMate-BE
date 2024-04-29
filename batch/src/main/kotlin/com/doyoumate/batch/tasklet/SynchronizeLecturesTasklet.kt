@@ -2,6 +2,7 @@ package com.doyoumate.batch.tasklet
 
 import com.doyoumate.batch.annotation.Tasklet
 import com.doyoumate.batch.util.ItemTasklet
+import com.doyoumate.common.util.getLogger
 import com.doyoumate.domain.lecture.adapter.LectureClient
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Semester
@@ -15,6 +16,7 @@ class SynchronizeLecturesTasklet(
     private val lectureRepository: LectureRepository,
     private val lectureClient: LectureClient
 ) : ItemTasklet<Flux<Lecture>> {
+    private val logger = getLogger()
     private val semesters = enumValues<Semester>()
     private val years = (2020..Year.now().value).toList()
     private val pairs = years.flatMap { year ->
@@ -30,6 +32,7 @@ class SynchronizeLecturesTasklet(
 
     override fun write(chunk: Chunk<out Flux<Lecture>>) {
         lectureRepository.saveAll(chunk.items.first())
+            .doOnNext { logger.info { it } }
             .collectList()
             .block()
     }
