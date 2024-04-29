@@ -15,9 +15,9 @@ class CustomStudentRepository(
 ) {
     fun upsert(student: Student): Mono<Student> =
         with(student) {
-            val query = query { "id" isEqualTo id }
+            val query = query { "number" isEqualTo number }
             val update = update {
-                "number" set number
+                "number" setOnInsert number
                 "name" set name
                 "birthDate" set birthDate
                 "phoneNumber" set phoneNumber
