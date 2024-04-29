@@ -1,13 +1,12 @@
 package com.doyoumate.domain.board.dto.response
 
 import com.doyoumate.domain.board.model.Post
-import com.doyoumate.domain.student.dto.response.StudentResponse
 import java.time.LocalDateTime
 
 data class PostResponse(
     val id: String,
     val board: BoardResponse,
-    val writer: StudentResponse,
+    val writer: WriterResponse,
     val title: String,
     val content: String,
     val likedUserIds: Set<String>,
@@ -20,7 +19,7 @@ data class PostResponse(
                 PostResponse(
                     id = id!!,
                     board = BoardResponse(board),
-                    writer = StudentResponse(writer),
+                    writer = WriterResponse(writer),
                     title = title,
                     content = content,
                     likedUserIds = likedUserIds,

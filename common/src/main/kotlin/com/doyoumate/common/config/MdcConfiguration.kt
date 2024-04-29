@@ -13,17 +13,16 @@ import reactor.core.publisher.Operators
 
 @Configuration
 class MdcConfiguration {
-    private val mdcContextKey = MdcConfiguration::class.java.name
+    private val key = MdcConfiguration::class.java.name
 
     @PostConstruct
     fun contextOperatorHook() {
-        Hooks.onEachOperator(
-            mdcContextKey, Operators.lift { _, subscriber -> MdcContextLifter(subscriber) })
+        Hooks.onEachOperator(key, Operators.lift { _, subscriber -> MdcContextLifter(subscriber) })
     }
 
     @PreDestroy
     fun cleanupHook() {
-        Hooks.resetOnEachOperator(mdcContextKey)
+        Hooks.resetOnEachOperator(key)
     }
 
     @Order(Int.MIN_VALUE)

@@ -17,9 +17,7 @@ class LoggingFilter : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> =
         exchange.log()
-            .flatMap {
-                chain.filter(it)
-            }
+            .flatMap { chain.filter(it) }
 
     private fun ServerWebExchange.log(): Mono<ServerWebExchange> =
         request.bodyToByteArray()

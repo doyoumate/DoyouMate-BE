@@ -23,6 +23,7 @@ class CommentService(
                 .flatMap {
                     commentRepository.save(
                         Comment(
+                            postId = postId,
                             writer = it,
                             content = content
                         )

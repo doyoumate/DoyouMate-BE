@@ -18,23 +18,23 @@ class StudentClient(
     private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
 ) {
-    fun getStudentById(id: String): Mono<Student> =
-        getProfileById(id)
+    fun getStudentByNumber(number: String): Mono<Student> =
+        getProfileByNumber(number)
             .filter { it.getValue<String>("SCHREG_STAT_CHANGE_NM") != "제적" }
             .flatMap {
                 Mono.zip(
                     Mono.just(it),
-                    getPhoneNumberById(id),
-                    getGpaById(id)
+                    getPhoneNumberByNumber(number),
+                    getGpaByNumber(number)
                         .defaultIfEmpty(0.0f),
-                    getRankById(id)
+                    getRankByNumber(number)
                         .defaultIfEmpty(0)
                 )
             }
             .map { (profile, phoneNumber, gpa, rank) ->
                 profile.run {
                     Student(
-                        id = getValue("STUNO"),
+                        number = getValue("STUNO"),
                         name = getValue("FNM"),
                         birthDate = LocalDate.parse(getValue("BIRYMD"), DateTimeFormatter.ofPattern("yyyyMMdd")),
                         phoneNumber = phoneNumber,
@@ -48,7 +48,7 @@ class StudentClient(
                 }
             }
 
-    private fun getProfileById(id: String): Mono<JsonNode> =
+    private fun getProfileByNumber(number: String): Mono<JsonNode> =
         LocalDate.now()
             .let {
                 """
@@ -57,7 +57,7 @@ class StudentClient(
             	        <YY value="${it.year}"/>
             	        <SHTM_CD value="${Semester(it).id}"/>
             	        <LANG_GUBUN value="K"/>
-            	        <STUNO value="$id"/>
+            	        <STUNO value="$number"/>
                     </rqM0_F0>
                  """
             }
@@ -70,7 +70,7 @@ class StudentClient(
             }
             .flatMap { xmlMapper.getRow(it) }
 
-    private fun getGpaById(id: String): Mono<Float> =
+    private fun getGpaByNumber(id: String): Mono<Float> =
         LocalDate.now()
             .let {
                 """
@@ -96,10 +96,10 @@ class StudentClient(
                 it.getValue<Float>("TOT_AVG_AVRP")
             }
 
-    private fun getPhoneNumberById(id: String): Mono<String> =
+    private fun getPhoneNumberByNumber(number: String): Mono<String> =
         """
             <rqM0_F0 task="system.commonTask" action="comSelect" xda="academic.ar.iframe.ar02_20030202_d_M0_F0_xda" con="enc"> 
-			    <STUNO value="$id"/>
+			    <STUNO value="$number"/>
             </rqM0_F0>
         """.let {
             webClient.post()
@@ -113,7 +113,7 @@ class StudentClient(
             it.getValue("MBPHON_NO")
         }
 
-    private fun getRankById(id: String): Mono<Int> =
+    private fun getRankByNumber(number: String): Mono<Int> =
         LocalDate.now()
             .let {
                 if (it.monthValue > 7) {
@@ -128,7 +128,7 @@ class StudentClient(
             	        <FCLT_GSCH_DIV_CD value="1"/>
             	        <YY value="$year"/> 
             	        <SHTM_CD value="${semester.id}"/> 
-            	        <STUNO value="$id"/>
+            	        <STUNO value="$number"/>
                     </rqM0_F0>
                 """
             }.let {

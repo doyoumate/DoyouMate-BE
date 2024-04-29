@@ -33,9 +33,7 @@ class SecurityConfiguration {
             logout { it.disable() }
             requestCache { it.disable() }
             securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-            exceptionHandling {
-                it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
-            }
+            exceptionHandling { it.authenticationEntryPoint(HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)) }
             authorizeExchange {
                 it.pathMatchers("/auth/**")
                     .permitAll()
