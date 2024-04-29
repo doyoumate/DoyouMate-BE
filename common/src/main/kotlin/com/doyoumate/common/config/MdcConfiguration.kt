@@ -30,6 +30,7 @@ class MdcConfiguration {
     @Bean
     fun mdcFilter(): MdcFilter = MdcFilter()
 
+    @Order(Int.MIN_VALUE + 1)
     @Bean
     fun loggingFilter(): LoggingFilter = LoggingFilter()
 }
