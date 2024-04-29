@@ -9,5 +9,9 @@ data class UpdatePostRequest(
     val content: String,
 ) {
     fun updateEntity(post: Post): Post =
-        post.copy(board = board, title = title, content = content)
+        post.copy(
+            board = board,
+            title = title,
+            content = content
+        )
 }

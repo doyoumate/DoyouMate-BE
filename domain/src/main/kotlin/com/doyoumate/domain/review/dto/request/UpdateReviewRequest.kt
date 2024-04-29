@@ -7,5 +7,8 @@ data class UpdateReviewRequest(
     val content: String,
 ) {
     fun updateEntity(review: Review): Review =
-        review.copy(score = score, content = content)
+        review.copy(
+            score = score,
+            content = content
+        )
 }

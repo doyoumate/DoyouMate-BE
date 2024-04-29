@@ -15,7 +15,5 @@ fun JobLauncher.run(job: Job): JobExecution = run(job, createJobParameters())
 
 private fun createJobParameters(): JobParameters =
     hashMapOf<String, JobParameter<*>>()
-        .apply {
-            put("time", JobParameter(Date().time, Long::class.java))
-        }
+        .apply { put("time", JobParameter(Date().time, Long::class.java)) }
         .let { JobParameters(it) }

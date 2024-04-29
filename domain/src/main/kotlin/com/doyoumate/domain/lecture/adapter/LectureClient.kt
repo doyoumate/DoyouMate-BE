@@ -32,26 +32,25 @@ class LectureClient(
                 .bodyValue(it)
                 .retrieve()
                 .bodyToMono<String>()
-        }.flatMapMany {
-            xmlMapper.getRows(it)
-        }.map {
-            it.run {
-                Lecture(
-                    id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
-                    year = getValue("OPEN_YY"),
-                    grade = getValue("EDUCUR_CORS_SHYS_CD"),
-                    semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
-                    major = getValue("ORGN4_NM"),
-                    name = getValue("SBJT_NM"),
-                    professor = getValue("FNM"),
-                    room = getValue("LT_ROOM_NM"),
-                    date = getValue("LTTM"),
-                    credit = getValue("LCTPT"),
-                    section = getValue<String>("CTNCCH_FLD_DIV_CD")
-                        .run { if (isBlank()) null else Section(toInt()) }
-                )
+        }.flatMapMany { xmlMapper.getRows(it) }
+            .map {
+                it.run {
+                    Lecture(
+                        id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
+                        year = getValue("OPEN_YY"),
+                        grade = getValue("EDUCUR_CORS_SHYS_CD"),
+                        semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
+                        major = getValue("ORGN4_NM"),
+                        name = getValue("SBJT_NM"),
+                        professor = getValue("FNM"),
+                        room = getValue("LT_ROOM_NM"),
+                        date = getValue("LTTM"),
+                        credit = getValue("LCTPT"),
+                        section = getValue<String>("CTNCCH_FLD_DIV_CD")
+                            .run { if (isBlank()) null else Section(toInt()) }
+                    )
+                }
             }
-        }
 
     fun getAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
         LocalDate.now()
@@ -72,12 +71,8 @@ class LectureClient(
                     .retrieve()
                     .bodyToMono<String>()
             }
-            .flatMapMany {
-                xmlMapper.getRows(it)
-            }
-            .map {
-                it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO")
-            }
+            .flatMapMany { xmlMapper.getRows(it) }
+            .map { it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO") }
 
     fun getPreAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
         LocalDate.now()
@@ -98,9 +93,6 @@ class LectureClient(
                     .retrieve()
                     .bodyToMono<String>()
             }
-            .flatMapMany {
-                xmlMapper.getRows(it)
-            }.map {
-                it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO")
-            }
+            .flatMapMany { xmlMapper.getRows(it) }
+            .map { it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO") }
 }

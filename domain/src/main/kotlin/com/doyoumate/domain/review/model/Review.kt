@@ -14,5 +14,5 @@ data class Review(
     val score: Int,
     val content: String,
     @CreatedDate
-    val createdDate: LocalDate? = null
+    val createdDate: LocalDate? = LocalDate.now()
 )

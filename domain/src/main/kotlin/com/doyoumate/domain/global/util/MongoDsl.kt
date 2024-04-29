@@ -21,15 +21,11 @@ class QueryDsl {
     val query = Query()
 
     infix fun String.isEqualTo(value: Any?) {
-        value?.let {
-            query.addCriteria(where(this).isEqualTo(it))
-        }
+        value?.let { query.addCriteria(where(this).isEqualTo(it)) }
     }
 
     infix fun String.like(value: String?) {
-        value?.let {
-            query.addCriteria(where(this).regex(value, "i"))
-        }
+        value?.let { query.addCriteria(where(this).regex(value, "i")) }
     }
 
     infix fun String.sortBy(direction: Sort.Direction) {
@@ -45,14 +41,10 @@ class UpdateDsl {
     val update = Update()
 
     infix fun String.set(value: Any?) {
-        value?.let {
-            update.set(this, it)
-        }
+        value?.let { update.set(this, it) }
     }
 
     infix fun String.setOnInsert(value: Any?) {
-        value?.let {
-            update.setOnInsert(this, it)
-        }
+        value?.let { update.setOnInsert(this, it) }
     }
 }
