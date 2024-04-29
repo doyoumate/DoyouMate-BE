@@ -9,7 +9,8 @@ import java.time.LocalDate
 @Document
 data class Student(
     @Id
-    val id: String,
+    val id: String? = null,
+    val number: String,
     val name: String,
     val password: String? = null,
     val birthDate: LocalDate,

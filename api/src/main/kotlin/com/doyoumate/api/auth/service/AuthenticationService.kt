@@ -33,10 +33,10 @@ class AuthenticationService(
 ) {
     fun sendCertification(request: SendCertificationRequest): Mono<Void> =
         with(request) {
-            certificationRepository.findByStudentId(studentId)
+            certificationRepository.findByStudentNumber(studentNumber)
                 .flatMap { Mono.error<Student>(CertificationAlreadyExistException()) }
                 .switchIfEmpty(Mono.defer {
-                    studentRepository.findById(studentId)
+                    studentRepository.findByNumber(studentNumber)
                         .switchIfEmpty(Mono.error(StudentNotFoundException()))
                 })
                 .filter { it.phoneNumber == to }
@@ -45,14 +45,12 @@ class AuthenticationService(
                 .switchIfEmpty(Mono.error(AccountAlreadyExistException()))
                 .map {
                     Certification(
-                        studentId = studentId,
+                        studentNumber = studentNumber,
                         code = List(6) { (0..9).random() }
                             .joinToString("") { it.toString() }
                     )
                 }
-                .flatMap {
-                    certificationRepository.save(it)
-                }
+                .flatMap { certificationRepository.save(it) }
                 .map {
                     messageService.sendOne(
                         SingleMessageSendingRequest(
@@ -69,14 +67,14 @@ class AuthenticationService(
 
     fun signUp(request: SignUpRequest): Mono<Void> =
         with(request) {
-            certificationRepository.findByStudentId(certification.studentId)
+            certificationRepository.findByStudentNumber(certification.studentNumber)
                 .filter { it == certification }
                 .switchIfEmpty(Mono.error(InvalidCertificationException()))
                 .flatMap {
                     Mono.zip(
-                        studentRepository.findById(certification.studentId)
+                        studentRepository.findByNumber(certification.studentNumber)
                             .flatMap { studentRepository.save(it.copy(password = passwordEncoder.encode(password))) },
-                        certificationRepository.deleteByStudentId(certification.studentId)
+                        certificationRepository.deleteByStudentNumber(certification.studentNumber)
                     )
                 }
                 .then()
@@ -84,7 +82,7 @@ class AuthenticationService(
 
     fun login(request: LoginRequest): Mono<LoginResponse> =
         with(request) {
-            studentRepository.findById(request.studentId)
+            studentRepository.findByNumber(request.studentNumber)
                 .switchIfEmpty(Mono.error(StudentNotFoundException()))
                 .filter { it.password != null }
                 .switchIfEmpty(Mono.error(AccountNotFoundException()))
@@ -92,7 +90,7 @@ class AuthenticationService(
                 .switchIfEmpty(Mono.error(PasswordNotMatchedException()))
                 .map {
                     JwtAuthentication(
-                        id = it.id,
+                        id = it.id!!,
                         authorities = setOf(SimpleGrantedAuthority(it.role.name))
                     )
                 }

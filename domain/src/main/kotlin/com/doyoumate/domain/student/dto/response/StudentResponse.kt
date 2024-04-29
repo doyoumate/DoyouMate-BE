@@ -5,6 +5,7 @@ import java.time.LocalDate
 
 data class StudentResponse(
     val id: String,
+    val number: String,
     val name: String,
     val birthDate: LocalDate,
     val phoneNumber: String?,
@@ -22,7 +23,8 @@ data class StudentResponse(
         operator fun invoke(student: Student): StudentResponse =
             with(student) {
                 StudentResponse(
-                    id = id,
+                    id = id!!,
+                    number = number,
                     name = name,
                     birthDate = birthDate,
                     phoneNumber = phoneNumber,

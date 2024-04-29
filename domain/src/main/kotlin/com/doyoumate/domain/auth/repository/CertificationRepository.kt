@@ -13,12 +13,12 @@ class CertificationRepository(
     @Value("\${expire}")
     private val expire: Long
 ) {
-    fun findByStudentId(studentId: String): Mono<Certification> =
+    fun findByStudentNumber(studentNumber: String): Mono<Certification> =
         redisTemplate.opsForValue()
-            .get(studentId.toKey())
+            .get(studentNumber.toKey())
             .map {
                 Certification(
-                    studentId = studentId,
+                    studentNumber = studentNumber,
                     code = it
                 )
             }
@@ -26,13 +26,13 @@ class CertificationRepository(
     fun save(certification: Certification): Mono<Certification> =
         with(certification) {
             redisTemplate.opsForValue()
-                .set(studentId.toKey(), code, Duration.ofMinutes(expire))
+                .set(studentNumber.toKey(), code, Duration.ofMinutes(expire))
                 .thenReturn(this)
         }
 
-    fun deleteByStudentId(studentId: String): Mono<Boolean> =
+    fun deleteByStudentNumber(studentNumber: String): Mono<Boolean> =
         redisTemplate.opsForValue()
-            .delete(studentId.toKey())
+            .delete(studentNumber.toKey())
 
     private fun String.toKey(): String = "certification:$this"
 }

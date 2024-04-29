@@ -9,7 +9,6 @@ import com.doyoumate.domain.student.adapter.StudentClient
 import com.doyoumate.domain.student.model.Student
 import com.doyoumate.domain.student.repository.CustomStudentRepository
 import org.springframework.batch.item.Chunk
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Year
 
@@ -34,15 +33,15 @@ class SynchronizeStudentsTasklet(
                 "$year${number++}"
             }
             ?.let {
-                studentClient.getStudentById(it)
+                studentClient.getStudentByNumber(it)
                     .flatMap { student ->
                         if (student.status.run { contains("휴학") || contains("졸업") }) {
                             Mono.just(student)
                         } else {
                             Mono.zip(
-                                lectureClient.getAppliedLectureIdsByStudentId(it)
+                                lectureClient.getAppliedLectureIdsByStudentNumber(it)
                                     .collectList(),
-                                lectureClient.getPreAppliedLectureIdsByStudentId(it)
+                                lectureClient.getPreAppliedLectureIdsByStudentNumber(it)
                                     .collectList()
                             ).map { (appliedLectureIds, preAppliedLectureIds) ->
                                 student.copy(

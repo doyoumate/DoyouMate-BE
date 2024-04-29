@@ -19,6 +19,7 @@ class CustomStudentRepository(
                 "id" isEqualTo id
             }
             val update = update {
+                "number" set number
                 "name" set name
                 "birthDate" set birthDate
                 "phoneNumber" set phoneNumber

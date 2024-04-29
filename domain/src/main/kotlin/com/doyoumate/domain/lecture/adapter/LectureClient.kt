@@ -53,7 +53,7 @@ class LectureClient(
             }
         }
 
-    fun getAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
+    fun getAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
         LocalDate.now()
             .let {
                 """
@@ -61,7 +61,7 @@ class LectureClient(
                         <FCLT_GSCH_DIV_CD value="1"/>
                         <YY value="${it.year}"/>   
                         <SHTM_CD value="${Semester(it).id}"/>   
-                        <STUNO value="$studentId"/>
+                        <STUNO value="$studentNumber"/>
                     </rqM2_F0>
                 """
             }
@@ -79,7 +79,7 @@ class LectureClient(
                 it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO")
             }
 
-    fun getPreAppliedLectureIdsByStudentId(studentId: String): Flux<String> =
+    fun getPreAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
         LocalDate.now()
             .let {
                 """
@@ -87,7 +87,7 @@ class LectureClient(
                         <FCLT_GSCH_DIV_CD value="1"/>
                         <YY value="${it.year}"/>   
                         <SHTM_CD value="${Semester(it).id}"/>   
-                        <STUNO value="$studentId"/>
+                        <STUNO value="$studentNumber"/>
                     </rqM2_F0>
                 """
             }
