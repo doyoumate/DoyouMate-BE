@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 data class Comment(
     @Id
     val id: String? = null,
+    val postId: String,
     val writer: Student,
     val content: String,
     val likedUserIds: HashSet<String> = hashSetOf(),
