@@ -6,11 +6,13 @@ import com.doyoumate.domain.auth.exception.PermissionDeniedException
 import com.doyoumate.domain.board.dto.request.CreatePostRequest
 import com.doyoumate.domain.board.dto.request.UpdatePostRequest
 import com.doyoumate.domain.board.dto.response.PostResponse
+import com.doyoumate.domain.board.exception.BoardNotFoundException
 import com.doyoumate.domain.board.exception.PostNotFoundException
 import com.doyoumate.domain.board.model.Post
 import com.doyoumate.domain.board.repository.BoardRepository
 import com.doyoumate.domain.board.repository.CustomPostRepository
 import com.doyoumate.domain.board.repository.PostRepository
+import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.JwtAuthentication
 import org.springframework.data.domain.Pageable
@@ -36,8 +38,10 @@ class PostService(
     fun createPost(request: CreatePostRequest, authentication: JwtAuthentication): Mono<PostResponse> =
         with(request) {
             Mono.zip(
-                boardRepository.findById(boardId),
+                boardRepository.findById(boardId)
+                    .switchIfEmpty(Mono.error(BoardNotFoundException())),
                 studentRepository.findById(authentication.id)
+                    .switchIfEmpty(Mono.error(StudentNotFoundException()))
             ).flatMap { (board, student) ->
                 postRepository.save(
                     Post(
