@@ -21,6 +21,10 @@ class CommentHandler(
         ServerResponse.ok()
             .body(commentService.getCommentsByPostId(request.pathVariable("postId")))
 
+    fun getCommentsByStudentId(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(commentService.getCommentsByStudentId(request.pathVariable("studentId")))
+
     fun createComment(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             Mono.zip(bodyToMono<CreateCommentRequest>(), getAuthentication())
