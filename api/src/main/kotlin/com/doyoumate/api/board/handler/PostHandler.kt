@@ -19,9 +19,12 @@ import reactor.kotlin.core.util.function.component2
 class PostHandler(
     private val postService: PostService
 ) {
-    fun getPostsByWriterId(request: ServerRequest): Mono<ServerResponse> =
-        ServerResponse.ok()
-            .body(postService.getPostsByWriterId(request.pathVariable("writerId")))
+    fun getMyPosts(request: ServerRequest): Mono<ServerResponse> =
+        request.getAuthentication()
+            .flatMap {
+                ServerResponse.ok()
+                    .body(postService.getPostsByWriterId(it.id))
+            }
 
     fun getLikedPosts(request: ServerRequest): Mono<ServerResponse> =
         request.getAuthentication()
