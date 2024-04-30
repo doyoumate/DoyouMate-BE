@@ -10,6 +10,7 @@ import com.doyoumate.domain.board.repository.CommentRepository
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.JwtAuthentication
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
@@ -17,6 +18,10 @@ class CommentService(
     private val commentRepository: CommentRepository,
     private val studentRepository: StudentRepository
 ) {
+    fun getCommentsByPostId(postId: String): Flux<CommentResponse> =
+        commentRepository.findAllByPostIdOrderByCreatedDateDesc(postId)
+            .map { CommentResponse(it) }
+
     fun createComment(request: CreateCommentRequest, authentication: JwtAuthentication): Mono<CommentResponse> =
         with(request) {
             studentRepository.findById(authentication.id)
