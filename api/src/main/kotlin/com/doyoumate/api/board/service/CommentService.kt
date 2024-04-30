@@ -22,8 +22,8 @@ class CommentService(
         commentRepository.findAllByPostIdOrderByCreatedDateDesc(postId)
             .map { CommentResponse(it) }
 
-    fun getCommentsByStudentId(studentId: String): Flux<CommentResponse> =
-        commentRepository.findAllByWriterIdOrderByCreatedDateDesc(studentId)
+    fun getCommentsByWriterId(writerId: String): Flux<CommentResponse> =
+        commentRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
             .map { CommentResponse(it) }
 
     fun createComment(request: CreateCommentRequest, authentication: JwtAuthentication): Mono<CommentResponse> =
