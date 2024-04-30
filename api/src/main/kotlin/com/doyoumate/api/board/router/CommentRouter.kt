@@ -14,7 +14,7 @@ class CommentRouter {
         router {
             "/comment".nest {
                 GET("/postId/{postId}", handler::getCommentsByPostId)
-                GET("/studentId/{studentId}", handler::getCommentsByStudentId)
+                GET("/writerId/{writerId}", handler::getCommentsByWriterId)
                 POST("", handler::createComment)
                 PUT("/{id}", handler::updateCommentById)
                 PATCH("/{id}/like", handler::likeCommentById)
