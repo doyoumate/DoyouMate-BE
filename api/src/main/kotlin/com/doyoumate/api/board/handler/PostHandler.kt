@@ -23,6 +23,13 @@ class PostHandler(
         ServerResponse.ok()
             .body(postService.getPostsByWriterId(request.pathVariable("writerId")))
 
+    fun getLikedPosts(request: ServerRequest): Mono<ServerResponse> =
+        request.getAuthentication()
+            .flatMap {
+                ServerResponse.ok()
+                    .body(postService.getLikedPostsByStudentId(it.id))
+            }
+
     fun getPopularPosts(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(postService.getPopularPosts())
