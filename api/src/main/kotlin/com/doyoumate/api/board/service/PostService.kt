@@ -31,6 +31,10 @@ class PostService(
         postRepository.findAllByWriterIdBOrderByCreatedDateBoardDesc(writerId)
             .map { PostResponse(it) }
 
+    fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
+        postRepository.findAllByLikedStudentIdsContains(studentId)
+            .map { PostResponse(it) }
+
     fun getPopularPosts(): Flux<PostResponse> =
         postRepository.findTop2OrderByLikedUserIdsSize()
             .map { PostResponse(it) }
