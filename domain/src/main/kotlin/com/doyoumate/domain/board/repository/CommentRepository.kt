@@ -11,5 +11,5 @@ interface CommentRepository : ReactiveMongoRepository<Comment, String> {
     fun findAllByPostIdOrderByCreatedDateDesc(postId: String): Flux<Comment>
 
     @Query("{ 'writer.id' : ?0 }")
-    fun findAllByWriterId(writerId: String): Flux<Comment>
+    fun findAllByWriterIdOrderByCreatedDateDesc(writerId: String): Flux<Comment>
 }
