@@ -19,6 +19,10 @@ import reactor.kotlin.core.util.function.component2
 class PostHandler(
     private val postService: PostService
 ) {
+    fun getPostsByStudentId(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(postService.getPostsByStudentId(request.pathVariable("studentId")))
+
     fun getPopularPosts(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(postService.getPopularPosts())
