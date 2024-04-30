@@ -22,6 +22,10 @@ class CommentService(
         commentRepository.findAllByPostIdOrderByCreatedDateDesc(postId)
             .map { CommentResponse(it) }
 
+    fun getCommentsByStudentId(studentId: String): Flux<CommentResponse> =
+        commentRepository.findAllByWriterIdOrderByCreatedDateDesc(studentId)
+            .map { CommentResponse(it) }
+
     fun createComment(request: CreateCommentRequest, authentication: JwtAuthentication): Mono<CommentResponse> =
         with(request) {
             studentRepository.findById(authentication.id)
