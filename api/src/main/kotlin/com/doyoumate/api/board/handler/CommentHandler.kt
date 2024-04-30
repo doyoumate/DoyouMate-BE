@@ -17,6 +17,10 @@ import reactor.kotlin.core.util.function.component2
 class CommentHandler(
     private val commentService: CommentService
 ) {
+    fun getCommentsByPostId(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(commentService.getCommentsByPostId(request.pathVariable("postId")))
+
     fun createComment(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             Mono.zip(bodyToMono<CreateCommentRequest>(), getAuthentication())
