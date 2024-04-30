@@ -31,6 +31,10 @@ class PostService(
         postRepository.findAllByWriterIdBOrderByCreatedDateBoardDesc(writerId)
             .map { PostResponse(it) }
 
+    fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
+        postRepository.findAllByLikedStudentIdsContains(studentId)
+            .map { PostResponse(it) }
+
     fun getPopularPosts(): Flux<PostResponse> =
         postRepository.findTop2OrderByLikedUserIdsSize()
             .map { PostResponse(it) }
@@ -77,9 +81,9 @@ class PostService(
         postRepository.findById(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .map {
-                it.copy(likedUserIds = it.likedUserIds.toMutableSet()
+                it.copy(likedStudentIds = it.likedStudentIds.toMutableSet()
                     .apply {
-                        if (authentication.id in it.likedUserIds) {
+                        if (authentication.id in it.likedStudentIds) {
                             remove(authentication.id)
                         } else {
                             add(authentication.id)

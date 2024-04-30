@@ -14,7 +14,7 @@ data class Comment(
     val postId: String,
     val writer: Student,
     val content: String,
-    val likedUserIds: HashSet<String> = hashSetOf(),
+    val likedStudentIds: HashSet<String> = hashSetOf(),
     @Indexed
     @CreatedDate
     val createdDate: LocalDateTime = LocalDateTime.now()

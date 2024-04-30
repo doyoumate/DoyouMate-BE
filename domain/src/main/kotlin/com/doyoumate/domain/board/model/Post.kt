@@ -15,7 +15,7 @@ data class Post(
     val writer: Student,
     val title: String,
     val content: String,
-    val likedUserIds: HashSet<String> = hashSetOf(),
+    val likedStudentIds: HashSet<String> = hashSetOf(),
     val commentIds: HashSet<String> = hashSetOf(),
     @Indexed
     @CreatedDate
