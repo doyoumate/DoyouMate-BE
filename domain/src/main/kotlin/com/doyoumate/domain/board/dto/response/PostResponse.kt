@@ -9,7 +9,7 @@ data class PostResponse(
     val writer: WriterResponse,
     val title: String,
     val content: String,
-    val likedUserIds: Set<String>,
+    val likedStudentIds: Set<String>,
     val commentIds: Set<String>,
     val createdDate: LocalDateTime
 ) {
@@ -22,7 +22,7 @@ data class PostResponse(
                     writer = WriterResponse(writer),
                     title = title,
                     content = content,
-                    likedUserIds = likedUserIds,
+                    likedStudentIds = likedStudentIds,
                     commentIds = commentIds,
                     createdDate = createdDate
                 )
