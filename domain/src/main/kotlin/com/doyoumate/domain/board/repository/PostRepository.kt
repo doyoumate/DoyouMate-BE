@@ -15,6 +15,8 @@ interface PostRepository : ReactiveMongoRepository<Post, String> {
     @Query("{ 'writer.id' : ?0 }")
     fun findAllByWriterIdBOrderByCreatedDateBoardDesc(writerId: String): Flux<Post>
 
+    fun findAllByLikedStudentIdsContains(studentId: String): Flux<Post>
+
     @Aggregation(
         pipeline = [
             "{ \$addFields: { count: { \$size: '\$likedUserIds' } }}",
