@@ -12,8 +12,8 @@ import reactor.core.publisher.Hooks
 import reactor.core.publisher.Operators
 
 @Configuration
-class MdcConfiguration {
-    private val key = MdcConfiguration::class.java.name
+class LoggingConfiguration {
+    private val key = LoggingConfiguration::class.java.name
 
     @PostConstruct
     fun contextOperatorHook() {
