@@ -19,10 +19,10 @@ interface PostRepository : ReactiveMongoRepository<Post, String> {
 
     @Aggregation(
         pipeline = [
-            "{ \$addFields: { count: { \$size: '\$likedUserIds' } }}",
+            "{ \$addFields: { count: { \$size: '\$likedStudentIds' } }}",
             "{ \$sort: { count: -1 } }",
             "{ \$limit: 2 }"
         ]
     )
-    fun findTop2OrderByLikedUserIdsSize(): Flux<Post>
+    fun findTop2OrderByLikedStudentIdsSize(): Flux<Post>
 }

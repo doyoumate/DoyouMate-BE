@@ -36,7 +36,7 @@ class PostService(
             .map { PostResponse(it) }
 
     fun getPopularPosts(): Flux<PostResponse> =
-        postRepository.findTop2OrderByLikedUserIdsSize()
+        postRepository.findTop2OrderByLikedStudentIdsSize()
             .map { PostResponse(it) }
 
     fun searchPosts(boardId: String?, content: String, pageable: Pageable): Flux<PostResponse> =
