@@ -20,7 +20,7 @@ class LectureService(
     private val customLectureRepository: CustomLectureRepository,
     private val studentRepository: StudentRepository
 ) {
-    fun getLecturesByIds(ids: List<String>): Flux<LectureResponse> =
+    fun getLecturesByIds(ids: Collection<String>): Flux<LectureResponse> =
         lectureRepository.findAllByIdIn(ids)
             .map { LectureResponse(it) }
 

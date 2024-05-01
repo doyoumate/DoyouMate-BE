@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 
 @Repository
 interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
-    fun findAllByIdIn(ids: List<String>): Flux<Lecture>
+    fun findAllByIdIn(ids: Collection<String>): Flux<Lecture>
 
     @Aggregation(
         pipeline = [
