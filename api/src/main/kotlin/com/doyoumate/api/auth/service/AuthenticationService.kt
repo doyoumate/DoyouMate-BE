@@ -1,12 +1,16 @@
 package com.doyoumate.api.auth.service
 
 import com.doyoumate.domain.auth.dto.request.LoginRequest
+import com.doyoumate.domain.auth.dto.request.RefreshRequest
 import com.doyoumate.domain.auth.dto.request.SendCertificationRequest
 import com.doyoumate.domain.auth.dto.request.SignUpRequest
 import com.doyoumate.domain.auth.dto.response.LoginResponse
+import com.doyoumate.domain.auth.dto.response.RefreshResponse
 import com.doyoumate.domain.auth.exception.*
 import com.doyoumate.domain.auth.model.Certification
+import com.doyoumate.domain.auth.model.RefreshToken
 import com.doyoumate.domain.auth.repository.CertificationRepository
+import com.doyoumate.domain.auth.repository.RefreshTokenRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.model.Student
 import com.doyoumate.domain.student.repository.StudentRepository
@@ -25,6 +29,7 @@ import reactor.core.publisher.Mono
 class AuthenticationService(
     private val studentRepository: StudentRepository,
     private val certificationRepository: CertificationRepository,
+    private val refreshTokenRepository: RefreshTokenRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
     private val jwtProvider: JwtProvider,
     private val messageService: DefaultMessageService,
@@ -101,4 +106,34 @@ class AuthenticationService(
                     )
                 }
         }
+
+    fun refresh(request: RefreshRequest): Mono<RefreshResponse> =
+        with(request) {
+            Mono.just(jwtProvider.getAuthentication(refreshToken))
+                .onErrorResume { Mono.error(InvalidTokenException()) }
+                .flatMap { authentication ->
+                    refreshTokenRepository.findByStudentId(authentication.id)
+                        .switchIfEmpty(Mono.error(TokenNotFoundException()))
+                        .filter { it.content == refreshToken }
+                        .switchIfEmpty(Mono.defer {
+                            refreshTokenRepository.deleteByStudentId(authentication.id)
+                                .then(Mono.error(InvalidAccessException()))
+                        })
+                        .flatMap {
+                            refreshTokenRepository.save(
+                                RefreshToken(
+                                    studentId = it.studentId,
+                                    content = jwtProvider.createRefreshToken(authentication)
+                                )
+                            )
+                        }
+                        .map {
+                            RefreshResponse(
+                                accessToken = jwtProvider.createAccessToken(authentication),
+                                refreshToken = it.content
+                            )
+                        }
+                }
+        }
+
 }
