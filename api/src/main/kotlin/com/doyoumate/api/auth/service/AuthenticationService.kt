@@ -1,5 +1,7 @@
 package com.doyoumate.api.auth.service
 
+import com.doyoumate.common.util.component1
+import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.dto.request.LoginRequest
 import com.doyoumate.domain.auth.dto.request.RefreshRequest
 import com.doyoumate.domain.auth.dto.request.SendCertificationRequest
@@ -99,10 +101,21 @@ class AuthenticationService(
                         authorities = setOf(SimpleGrantedAuthority(it.role.name))
                     )
                 }
-                .map {
+                .flatMap {
+                    Mono.zip(
+                        Mono.just(it),
+                        refreshTokenRepository.save(
+                            RefreshToken(
+                                studentId = it.id,
+                                content = jwtProvider.createRefreshToken(it)
+                            )
+                        )
+                    )
+                }
+                .map { (authentication, refreshToken) ->
                     LoginResponse(
-                        accessToken = jwtProvider.createAccessToken(it),
-                        refreshToken = jwtProvider.createRefreshToken(it)
+                        accessToken = jwtProvider.createAccessToken(authentication),
+                        refreshToken = refreshToken.content
                     )
                 }
         }
