@@ -6,7 +6,6 @@ import com.doyoumate.domain.student.repository.StudentRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
 
 @Service
 class StudentService(
@@ -14,7 +13,7 @@ class StudentService(
 ) {
     fun getStudentById(id: String): Mono<StudentResponse> =
         studentRepository.findById(id)
-            .switchIfEmpty { Mono.error(StudentNotFoundException()) }
+            .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .map { StudentResponse(it) }
 
     fun getAppliedStudentsByLectureId(lectureId: String): Flux<StudentResponse> =
