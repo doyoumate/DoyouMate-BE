@@ -33,7 +33,7 @@ class LoggingFilter : WebFilter {
                     })
                     .response(response.apply {
                         beforeCommit {
-                            loggingResponse(response)
+                            loggingResponse(this)
                             Mono.empty()
                         }
                     })
