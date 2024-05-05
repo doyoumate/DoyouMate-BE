@@ -17,6 +17,7 @@ import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.model.Student
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.core.JwtProvider
+import com.github.jwt.exception.JwtException
 import com.github.jwt.security.JwtAuthentication
 import net.nurigo.sdk.message.model.Message
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest
@@ -26,6 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.onErrorResume
 
 @Service
 class AuthenticationService(
@@ -122,8 +124,8 @@ class AuthenticationService(
 
     fun refresh(request: RefreshRequest): Mono<RefreshResponse> =
         with(request) {
-            Mono.just(jwtProvider.getAuthentication(refreshToken))
-                .onErrorResume { Mono.error(InvalidTokenException()) }
+            Mono.fromCallable { jwtProvider.getAuthentication(refreshToken) }
+                .onErrorResume(JwtException::class) { Mono.error(InvalidTokenException()) }
                 .flatMap { authentication ->
                     refreshTokenRepository.findByStudentId(authentication.id)
                         .switchIfEmpty(Mono.error(TokenNotFoundException()))
