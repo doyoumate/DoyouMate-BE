@@ -8,7 +8,7 @@ import com.doyoumate.domain.review.exception.ReviewNotFoundException
 import com.doyoumate.domain.review.repository.ReviewRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
-import com.github.jwt.security.JwtAuthentication
+import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -26,7 +26,7 @@ class ReviewService(
         reviewRepository.findAllByLectureId(lectureId)
             .map { ReviewResponse(it) }
 
-    fun createReview(request: CreateReviewRequest, authentication: JwtAuthentication): Mono<ReviewResponse> =
+    fun createReview(request: CreateReviewRequest, authentication: DefaultJwtAuthentication): Mono<ReviewResponse> =
         studentRepository.findById(authentication.id)
             .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .filter { request.lectureId in it.appliedLectureIds }
@@ -37,7 +37,7 @@ class ReviewService(
     fun updateReviewById(
         id: String,
         request: UpdateReviewRequest,
-        authentication: JwtAuthentication
+        authentication: DefaultJwtAuthentication
     ): Mono<ReviewResponse> =
         reviewRepository.findById(id)
             .switchIfEmpty(Mono.error(ReviewNotFoundException()))
@@ -46,7 +46,7 @@ class ReviewService(
             .flatMap { reviewRepository.save(request.updateEntity(it)) }
             .map { ReviewResponse(it) }
 
-    fun deleteReviewById(id: String, authentication: JwtAuthentication): Mono<Void> =
+    fun deleteReviewById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
         reviewRepository.findById(id)
             .switchIfEmpty(Mono.error(ReviewNotFoundException()))
             .filter { it.studentId == authentication.id }

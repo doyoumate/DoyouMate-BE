@@ -14,7 +14,7 @@ import com.doyoumate.domain.board.repository.CustomPostRepository
 import com.doyoumate.domain.board.repository.PostRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
-import com.github.jwt.security.JwtAuthentication
+import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -28,7 +28,7 @@ class PostService(
     private val boardRepository: BoardRepository,
 ) {
     fun getPostsByWriterId(writerId: String): Flux<PostResponse> =
-        postRepository.findAllByWriterIdBOrderByCreatedDateBoardDesc(writerId)
+        postRepository.findAllByWriterIdOrderByCreatedDateBoardDesc(writerId)
             .map { PostResponse(it) }
 
     fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
@@ -43,7 +43,7 @@ class PostService(
         customPostRepository.search(boardId, content, pageable)
             .map { PostResponse(it) }
 
-    fun createPost(request: CreatePostRequest, authentication: JwtAuthentication): Mono<PostResponse> =
+    fun createPost(request: CreatePostRequest, authentication: DefaultJwtAuthentication): Mono<PostResponse> =
         with(request) {
             Mono.zip(
                 boardRepository.findById(boardId)
@@ -62,7 +62,11 @@ class PostService(
             }.map { PostResponse(it) }
         }
 
-    fun updatePostById(id: String, request: UpdatePostRequest, authentication: JwtAuthentication): Mono<PostResponse> =
+    fun updatePostById(
+        id: String,
+        request: UpdatePostRequest,
+        authentication: DefaultJwtAuthentication
+    ): Mono<PostResponse> =
         postRepository.findById(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .filter { it.writer.id == authentication.id }
@@ -70,14 +74,14 @@ class PostService(
             .flatMap { postRepository.save(request.updateEntity(it)) }
             .map { PostResponse(it) }
 
-    fun deletePostById(id: String, authentication: JwtAuthentication): Mono<Void> =
+    fun deletePostById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
         postRepository.findById(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { postRepository.deleteById(id) }
 
-    fun likePostById(id: String, authentication: JwtAuthentication): Mono<PostResponse> =
+    fun likePostById(id: String, authentication: DefaultJwtAuthentication): Mono<PostResponse> =
         postRepository.findById(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .map {

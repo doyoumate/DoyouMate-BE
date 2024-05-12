@@ -1,6 +1,6 @@
 package com.doyoumate.batch.config
 
-import com.github.jwt.core.JwtProvider
+import com.github.jwt.core.DefaultJwtProvider
 import com.github.jwt.security.ReactiveJwtFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,6 +37,6 @@ class SecurityConfiguration {
         }
 
     @Bean
-    fun jwtFilter(jwtProvider: JwtProvider): ReactiveJwtFilter =
+    fun jwtFilter(jwtProvider: DefaultJwtProvider): ReactiveJwtFilter =
         ReactiveJwtFilter(jwtProvider)
 }

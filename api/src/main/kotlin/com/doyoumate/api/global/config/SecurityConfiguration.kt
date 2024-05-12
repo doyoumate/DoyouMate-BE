@@ -1,8 +1,8 @@
 package com.doyoumate.api.global.config
 
 import com.doyoumate.domain.student.model.enum.Role
-import com.github.jwt.core.JwtProvider
-import com.github.jwt.security.JwtAuthentication
+import com.github.jwt.core.DefaultJwtProvider
+import com.github.jwt.security.DefaultJwtAuthentication
 import com.github.jwt.security.ReactiveJwtFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -47,7 +47,7 @@ class SecurityConfiguration {
         }
 
     @Bean
-    fun jwtFilter(jwtProvider: JwtProvider): ReactiveJwtFilter =
+    fun jwtFilter(jwtProvider: DefaultJwtProvider): ReactiveJwtFilter =
         ReactiveJwtFilter(jwtProvider)
 
     @Bean
@@ -55,6 +55,6 @@ class SecurityConfiguration {
         BCryptPasswordEncoder()
 }
 
-fun ServerRequest.getAuthentication(): Mono<JwtAuthentication> =
+fun ServerRequest.getAuthentication(): Mono<DefaultJwtAuthentication> =
     principal()
-        .cast<JwtAuthentication>()
+        .cast<DefaultJwtAuthentication>()

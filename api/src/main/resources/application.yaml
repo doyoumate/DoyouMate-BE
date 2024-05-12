@@ -1,9 +1,9 @@
 spring:
   profiles:
     include:
-      - domain
-      - common
-      - env
+    - domain
+    - common
+    - env
   main:
     banner-mode: off
 ---
@@ -12,7 +12,7 @@ spring:
     activate:
       on-profile: local
 jwt:
-  secretKey: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
+  secret: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
   accessTokenExpire: 30
   refreshTokenExpire: 120
 ---
@@ -21,7 +21,7 @@ spring:
     activate:
       on-profile: dev
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
   refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
 coolsms:
@@ -34,7 +34,7 @@ spring:
     activate:
       on-profile: prod
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
   refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
 coolsms:

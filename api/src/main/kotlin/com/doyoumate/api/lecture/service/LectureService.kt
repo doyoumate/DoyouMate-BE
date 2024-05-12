@@ -8,7 +8,7 @@ import com.doyoumate.domain.lecture.repository.CustomLectureRepository
 import com.doyoumate.domain.lecture.repository.LectureRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
-import com.github.jwt.security.JwtAuthentication
+import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -41,7 +41,7 @@ class LectureService(
         lectureRepository.getFilter()
             .map { FilterResponse(it) }
 
-    fun markLectureById(id: String, authentication: JwtAuthentication): Mono<Void> =
+    fun markLectureById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
         studentRepository.findById(authentication.id)
             .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .map {

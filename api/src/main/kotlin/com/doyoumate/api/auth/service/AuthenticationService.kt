@@ -16,9 +16,9 @@ import com.doyoumate.domain.auth.repository.RefreshTokenRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.model.Student
 import com.doyoumate.domain.student.repository.StudentRepository
-import com.github.jwt.core.JwtProvider
+import com.github.jwt.core.DefaultJwtProvider
 import com.github.jwt.exception.JwtException
-import com.github.jwt.security.JwtAuthentication
+import com.github.jwt.security.DefaultJwtAuthentication
 import net.nurigo.sdk.message.model.Message
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest
 import net.nurigo.sdk.message.service.DefaultMessageService
@@ -35,7 +35,7 @@ class AuthenticationService(
     private val certificationRepository: CertificationRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
-    private val jwtProvider: JwtProvider,
+    private val jwtProvider: DefaultJwtProvider,
     private val messageService: DefaultMessageService,
     @Value("\${coolsms.from}")
     private val from: String
@@ -98,9 +98,9 @@ class AuthenticationService(
                 .filter { passwordEncoder.matches(password, it.password) }
                 .switchIfEmpty(Mono.error(PasswordNotMatchedException()))
                 .map {
-                    JwtAuthentication(
+                    DefaultJwtAuthentication(
                         id = it.id!!,
-                        authorities = setOf(SimpleGrantedAuthority(it.role.name))
+                        roles = setOf(SimpleGrantedAuthority(it.role.name))
                     )
                 }
                 .flatMap {
