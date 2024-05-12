@@ -13,7 +13,7 @@ interface PostRepository : ReactiveMongoRepository<Post, String> {
     fun findAllByBoardId(boardId: String): Flux<Post>
 
     @Query("{ 'writer.id' : ?0 }")
-    fun findAllByWriterIdBOrderByCreatedDateBoardDesc(writerId: String): Flux<Post>
+    fun findAllByWriterIdOrderByCreatedDateBoardDesc(writerId: String): Flux<Post>
 
     fun findAllByLikedStudentIdsContains(studentId: String): Flux<Post>
 
