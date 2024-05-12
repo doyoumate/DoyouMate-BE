@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux
 
 @Repository
 interface CommentRepository : ReactiveMongoRepository<Comment, String> {
-    fun findAllByPostIdOrderByCreatedDateDesc(postId: String): Flux<Comment>
+    fun findAllByPostIdOrderByCreatedDateAsc(postId: String): Flux<Comment>
 
     @Query("{ 'writer.id' : ?0 }")
     fun findAllByWriterIdOrderByCreatedDateDesc(writerId: String): Flux<Comment>
