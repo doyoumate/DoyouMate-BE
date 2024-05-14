@@ -1,8 +1,8 @@
 spring:
   profiles:
     include:
-      - domain
-      - common
+    - domain
+    - common
   main:
     banner-mode: off
   datasource:
@@ -19,7 +19,7 @@ spring:
     job:
       name: ${JOB}
 jwt:
-  secretKey: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
+  secret: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
   accessTokenExpire: 30
   refreshTokenExpire: 120
 ---
@@ -31,7 +31,7 @@ spring:
     job:
       name: ${JOB}
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET_KEY}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
   refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
 ---
@@ -43,6 +43,6 @@ spring:
     job:
       name: ${JOB}
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET_KEY}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}
   refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
