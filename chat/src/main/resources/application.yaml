@@ -1,0 +1,38 @@
+spring:
+  profiles:
+    include:
+    - domain
+    - common
+  main:
+    banner-mode: off
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  kafka:
+    bootstrap-servers: asddsaasd
+jwt:
+  secret: asdsddladsldjaksjkdljklsjkldsaasdkjlasksadjkalsddjklksdalkdsajkl
+  accessTokenExpire: 30
+  refreshTokenExpire: 120
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  kafka:
+    bootstrap-servers: asddsaasd
+jwt:
+  secret: ${JWT_SECRET}
+  accessTokenExpire: ${JWT_ACCESS_EXPIRE}
+  refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+jwt:
+  secret: ${JWT_SECRET}
+  accessTokenExpire: ${JWT_ACCESS_EXPIRE}
+  refreshTokenExpire: ${JWT_REFRESH_EXPIRE}
