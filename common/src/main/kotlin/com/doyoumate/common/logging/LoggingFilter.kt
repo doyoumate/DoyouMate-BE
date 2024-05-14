@@ -1,6 +1,7 @@
 package com.doyoumate.common.logging
 
 import com.doyoumate.common.util.getLogger
+import com.doyoumate.common.util.prettifyJson
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -42,7 +43,7 @@ class LoggingFilter : WebFilter {
 
     private fun ServerHttpRequest.bodyToByteArray(): Mono<ByteArray> =
         DataBufferUtils
-            .join(this.body)
+            .join(body)
             .map { buffer ->
                 ByteArray(buffer.readableByteCount())
                     .also { DataBufferUtils.release(buffer.read(it)) }
@@ -50,21 +51,10 @@ class LoggingFilter : WebFilter {
             .defaultIfEmpty(ByteArray(0))
 
     private fun loggingRequest(request: ServerHttpRequest, body: ByteArray) {
-        request.apply {
-            logger.info {
-                "HTTP $method ${uri.run { "$path${query?.let { "?$it" } ?: ""}" }} ${
-                    String(body)
-                        .replace(Regex("[ \\n]"), "")
-                        .replace(",", ", ")
-                        .trim()
-                }"
-            }
-        }
+        request.apply { logger.info { "HTTP $method ${uri.run { "$path${query?.let { "?$it" } ?: ""}" }} ${String(body).prettifyJson()}" } }
     }
 
     private fun loggingResponse(response: ServerHttpResponse) {
-        response.apply {
-            logger.info { "HTTP $statusCode" }
-        }
+        response.apply { logger.info { "HTTP $statusCode" } }
     }
 }
