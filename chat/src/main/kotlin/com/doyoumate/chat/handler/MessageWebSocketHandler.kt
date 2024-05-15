@@ -24,16 +24,17 @@ class MessageWebSocketHandler(
     private val messageRepository: MessageRepository,
     private val objectMapper: ObjectMapper,
     private val messageProducer: ReactiveKafkaProducerTemplate<String, Any>,
-    private val messageConsumer: ReactiveKafkaConsumerTemplate<String, Message>
+    private val messageConsumer: ReactiveKafkaConsumerTemplate<String, Message>,
 ) : WebSocketHandler {
     private val logger = getLogger()
     private val sink = Sinks.many()
         .multicast()
-        .onBackpressureBuffer<Message>()
+        .directAllOrNothing<Message>()
 
     override fun handle(session: WebSocketSession): Mono<Void> =
         ReactiveSecurityContextHolder.getContext()
             .map { it.authentication as DefaultJwtAuthentication }
+            .doOnNext { logger.info { "WebSocket connected ${it.id}" } }
             .flatMap { authentication ->
                 Mono.zip(
                     session.receive()
@@ -49,7 +50,7 @@ class MessageWebSocketHandler(
                                 )
                             )
                         }
-                        .flatMap { messageProducer.send("message", it) }
+                        .flatMap { messageProducer.send("message", authentication.id, it) }
                         .then(),
                     session.send(
                         sink.asFlux()
