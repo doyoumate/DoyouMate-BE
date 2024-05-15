@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class MessageConfiguration(
+class SmsConfiguration(
     @Value("\${coolsms.apiKey}")
     private val apiKey: String,
     @Value("\${coolsms.secretKey}")
     private val secretKey: String,
 ) {
     @Bean
-    fun messageService(): DefaultMessageService =
+    fun smsService(): DefaultMessageService =
         initialize(apiKey, secretKey, "https://api.coolsms.co.kr")
 }

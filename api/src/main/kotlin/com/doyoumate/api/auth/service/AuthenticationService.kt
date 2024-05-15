@@ -36,7 +36,7 @@ class AuthenticationService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
     private val jwtProvider: DefaultJwtProvider,
-    private val messageService: DefaultMessageService,
+    private val smsService: DefaultMessageService,
     @Value("\${coolsms.from}")
     private val from: String
 ) {
@@ -61,7 +61,7 @@ class AuthenticationService(
                 }
                 .flatMap { certificationRepository.save(it) }
                 .map {
-                    messageService.sendOne(
+                    smsService.sendOne(
                         SingleMessageSendingRequest(
                             Message(
                                 from = from,
