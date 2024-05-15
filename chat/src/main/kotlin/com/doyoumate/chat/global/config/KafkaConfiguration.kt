@@ -14,6 +14,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer
 import org.springframework.kafka.support.serializer.JsonSerializer
 import reactor.kafka.receiver.ReceiverOptions
 import reactor.kafka.sender.SenderOptions
+import java.util.*
 
 @Configuration
 class ProducerConfiguration(
@@ -38,7 +39,7 @@ class ConsumerConfiguration(
 ) {
     @Bean("messageConsumer")
     fun messageConsumer(): ReactiveKafkaConsumerTemplate<String, Message> =
-        ReactiveKafkaConsumerTemplate(createReceiverOptions("message-group", setOf("message")))
+        ReactiveKafkaConsumerTemplate(createReceiverOptions(UUID.randomUUID().toString(), setOf("message")))
 
     private inline fun <reified T> createReceiverOptions(
         groupId: String,
