@@ -1,11 +1,16 @@
 package com.doyoumate.chat.handler
 
 import com.doyoumate.common.annotation.Handler
+import com.doyoumate.common.util.component1
+import com.doyoumate.common.util.component2
 import com.doyoumate.common.util.getLogger
 import com.doyoumate.common.util.prettifyJson
 import com.doyoumate.domain.message.dto.request.SendMessageRequest
+import com.doyoumate.domain.message.dto.response.MessageResponse
 import com.doyoumate.domain.message.model.Message
 import com.doyoumate.domain.message.repository.MessageRepository
+import com.doyoumate.domain.student.exception.StudentNotFoundException
+import com.doyoumate.domain.student.repository.StudentRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.jwt.security.DefaultJwtAuthentication
@@ -22,14 +27,15 @@ import reactor.core.publisher.Sinks
 @Handler
 class MessageWebSocketHandler(
     private val messageRepository: MessageRepository,
-    private val objectMapper: ObjectMapper,
+    private val studentRepository: StudentRepository,
     private val messageProducer: ReactiveKafkaProducerTemplate<String, Any>,
-    private val messageConsumer: ReactiveKafkaConsumerTemplate<String, Message>,
+    private val messageConsumer: ReactiveKafkaConsumerTemplate<String, MessageResponse>,
+    private val objectMapper: ObjectMapper
 ) : WebSocketHandler {
     private val logger = getLogger()
     private val sink = Sinks.many()
         .multicast()
-        .directAllOrNothing<Message>()
+        .directAllOrNothing<MessageResponse>()
 
     override fun handle(session: WebSocketSession): Mono<Void> =
         ReactiveSecurityContextHolder.getContext()
@@ -42,19 +48,24 @@ class MessageWebSocketHandler(
                         .doOnNext { logger.info { "WebSocket received: ${it.prettifyJson()}" } }
                         .map { objectMapper.readValue<SendMessageRequest>(it) }
                         .flatMap {
-                            messageRepository.save(
-                                Message(
-                                    senderId = authentication.id,
-                                    receiverId = it.receiverId,
-                                    content = it.content
-                                )
+                            Mono.zip(
+                                messageRepository.save(
+                                    Message(
+                                        senderId = authentication.id,
+                                        receiverId = it.receiverId,
+                                        content = it.content
+                                    )
+                                ),
+                                studentRepository.findById(it.receiverId)
+                                    .switchIfEmpty(Mono.error(StudentNotFoundException()))
                             )
                         }
+                        .map { (message, student) -> MessageResponse(message, student) }
                         .flatMap { messageProducer.send("message", authentication.id, it) }
                         .then(),
                     session.send(
                         sink.asFlux()
-                            .filter { it.receiverId == authentication.id || it.senderId == authentication.id }
+                            .filter { it.receiverId == authentication.id || it.sender.id == authentication.id }
                             .map { objectMapper.writeValueAsString(it) }
                             .map(session::textMessage)
                             .doOnNext { logger.info { "WebSocket sent: ${it.payloadAsText.prettifyJson()}" } }

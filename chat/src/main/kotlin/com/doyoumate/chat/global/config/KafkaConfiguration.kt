@@ -1,6 +1,6 @@
 package com.doyoumate.chat.global.config
 
-import com.doyoumate.domain.message.model.Message
+import com.doyoumate.domain.message.dto.response.MessageResponse
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -38,7 +38,7 @@ class ConsumerConfiguration(
     private val properties: KafkaProperties
 ) {
     @Bean("messageConsumer")
-    fun messageConsumer(): ReactiveKafkaConsumerTemplate<String, Message> =
+    fun messageConsumer(): ReactiveKafkaConsumerTemplate<String, MessageResponse> =
         ReactiveKafkaConsumerTemplate(createReceiverOptions(UUID.randomUUID().toString(), setOf("message")))
 
     private inline fun <reified T> createReceiverOptions(
