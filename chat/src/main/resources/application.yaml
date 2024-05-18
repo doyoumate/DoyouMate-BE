@@ -6,6 +6,8 @@ spring:
   main:
     banner-mode: off
 ---
+server:
+  port: 8001
 spring:
   config:
     activate:
