@@ -1,50 +1,17 @@
 package com.doyoumate.domain.global.util
 
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
-import org.springframework.data.mongodb.core.query.Criteria.where
-import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.domain.Sort.Direction
+import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.query.Update
-import org.springframework.data.mongodb.core.query.isEqualTo
+import kotlin.reflect.KProperty
 
-fun query(init: QueryDsl.() -> Unit): Query =
-    QueryDsl()
-        .apply(init)
-        .query
-
-fun update(init: UpdateDsl.() -> Unit): Update =
-    UpdateDsl()
-        .apply(init)
-        .update
-
-class QueryDsl {
-    val query = Query()
-
-    infix fun String.isEqualTo(value: Any?) {
-        value?.let { query.addCriteria(where(this).isEqualTo(it)) }
-    }
-
-    infix fun String.like(value: String?) {
-        value?.let { query.addCriteria(where(this).regex(value, "i")) }
-    }
-
-    infix fun String.sortBy(direction: Sort.Direction) {
-        query.with(Sort.by(direction, this))
-    }
-
-    fun paging(pageable: Pageable) {
-        query.with(pageable)
-    }
+infix fun <T> Update.set(update: Pair<KProperty<T>, T>) {
+    update.also { (field, value) -> set(field.toDotPath(), value) }
 }
 
-class UpdateDsl {
-    val update = Update()
-
-    infix fun String.set(value: Any?) {
-        value?.let { update.set(this, it) }
-    }
-
-    infix fun String.setOnInsert(value: Any?) {
-        value?.let { update.setOnInsert(this, it) }
-    }
+infix fun <T> Update.setOnInsert(update: Pair<KProperty<T>, T>) {
+    update.also { (field, value) -> setOnInsert(field.toDotPath(), value) }
 }
+
+infix fun <T> KProperty<T>.sortBy(direction: Direction): Sort = Sort.by(direction, this.toDotPath())
