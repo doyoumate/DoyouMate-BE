@@ -12,5 +12,5 @@ dependencies {
     testFixturesImplementation("com.ninja-squad:springmockk:3.0.1")
     testFixturesImplementation("com.epages:restdocs-api-spec-webtestclient:0.17.1")
     testFixturesImplementation("com.epages:restdocs-api-spec:0.17.1")
-    testFixturesImplementation("com.github.earlgrey02:JWT:1.1.0")
+    testFixturesImplementation("com.github.earlgrey02:JWT:1.1.1")
 }
