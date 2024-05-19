@@ -27,6 +27,11 @@ class PostService(
     private val studentRepository: StudentRepository,
     private val boardRepository: BoardRepository,
 ) {
+    fun getPostById(id: String): Mono<PostResponse> =
+        postRepository.findById(id)
+            .switchIfEmpty(Mono.error(PostNotFoundException()))
+            .map { PostResponse(it) }
+
     fun getPostsByWriterId(writerId: String): Flux<PostResponse> =
         postRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
             .map { PostResponse(it) }
