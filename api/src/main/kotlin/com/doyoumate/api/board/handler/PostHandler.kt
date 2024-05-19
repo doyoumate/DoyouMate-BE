@@ -19,6 +19,10 @@ import reactor.kotlin.core.util.function.component2
 class PostHandler(
     private val postService: PostService
 ) {
+    fun getPostById(request: ServerRequest): Mono<ServerResponse> =
+        ServerResponse.ok()
+            .body(postService.getPostById(request.pathVariable("id")))
+
     fun getMyPosts(request: ServerRequest): Mono<ServerResponse> =
         request.getAuthentication()
             .flatMap {
