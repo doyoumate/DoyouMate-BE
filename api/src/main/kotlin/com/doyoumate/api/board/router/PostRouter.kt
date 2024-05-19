@@ -18,6 +18,7 @@ class PostRouter {
                 GET("/my", handler::getMyPosts)
                 GET("/liked", handler::getLikedPosts)
                 GET("/popular", handler::getPopularPosts)
+                GET("/{id}", handler::getPostById)
                 POST("", handler::createPost)
                 PUT("/{id}", handler::updatePostById)
                 PATCH("/{id}/like", handler::likePostById)
