@@ -28,11 +28,11 @@ class PostService(
     private val boardRepository: BoardRepository,
 ) {
     fun getPostsByWriterId(writerId: String): Flux<PostResponse> =
-        postRepository.findAllByWriterIdOrderByCreatedDateBoardDesc(writerId)
+        postRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
             .map { PostResponse(it) }
 
     fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
-        postRepository.findAllByLikedStudentIdsContains(studentId)
+        postRepository.findAllByLikedStudentIdsContainsOrderByCreatedDateDesc(studentId)
             .map { PostResponse(it) }
 
     fun getPopularPosts(): Flux<PostResponse> =

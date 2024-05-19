@@ -9,13 +9,13 @@ import reactor.core.publisher.Flux
 
 @Repository
 interface PostRepository : ReactiveMongoRepository<Post, String> {
-    @Query("{ 'board.id' : ?0 }")
+    @Query("{ 'board.id': ?0 }")
     fun findAllByBoardId(boardId: String): Flux<Post>
 
     @Query("{ 'writer.id': ?0 }", sort = "{ 'createdDate': -1 }")
     fun findAllByWriterIdOrderByCreatedDateDesc(writerId: String): Flux<Post>
 
-    fun findAllByLikedStudentIdsContains(studentId: String): Flux<Post>
+    fun findAllByLikedStudentIdsContainsOrderByCreatedDateDesc(studentId: String): Flux<Post>
 
     @Aggregation(
         pipeline = [
