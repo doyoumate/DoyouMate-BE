@@ -1,6 +1,5 @@
 api:
   uri: https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp
-expire: 10
 ---
 spring:
   config:
@@ -12,6 +11,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+certification:
+  expire: 10
 ---
 spring:
   config:
@@ -23,6 +24,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+certification:
+  expire: ${CERTIFICATION_EXPIRE}
 ---
 spring:
   config:
@@ -34,3 +37,5 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+certification:
+  expire: ${CERTIFICATION_EXPIRE}
