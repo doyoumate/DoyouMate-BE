@@ -1,6 +1,6 @@
 package com.doyoumate.domain.board.dto.response
 
-import com.doyoumate.domain.student.model.Student
+import com.doyoumate.domain.board.model.Writer
 
 data class WriterResponse(
     val id: String,
@@ -8,10 +8,10 @@ data class WriterResponse(
     val grade: Int
 ) {
     companion object {
-        operator fun invoke(student: Student): WriterResponse =
-            with(student) {
+        operator fun invoke(writer: Writer): WriterResponse =
+            with(writer) {
                 WriterResponse(
-                    id = id!!,
+                    id = id,
                     major = major,
                     grade = grade
                 )

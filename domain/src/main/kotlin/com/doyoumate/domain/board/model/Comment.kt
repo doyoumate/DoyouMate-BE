@@ -12,7 +12,7 @@ data class Comment(
     @Id
     val id: String? = null,
     val postId: String,
-    val writer: Student,
+    val writer: Writer,
     val content: String,
     val likedStudentIds: HashSet<String> = hashSetOf(),
     @Indexed
