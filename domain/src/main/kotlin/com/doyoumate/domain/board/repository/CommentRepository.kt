@@ -1,15 +1,18 @@
 package com.doyoumate.domain.board.repository
 
 import com.doyoumate.domain.board.model.Comment
-import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @Repository
 interface CommentRepository : ReactiveMongoRepository<Comment, String> {
-    fun findAllByPostIdOrderByCreatedDateAsc(postId: String): Flux<Comment>
+    fun findByIdAndDeletedDateIsNull(id: String): Mono<Comment>
 
-    @Query("{ 'writer.id' : ?0 }")
-    fun findAllByWriterIdOrderByCreatedDateDesc(writerId: String): Flux<Comment>
+    fun findAllByPostIdAndDeletedDateIsNull(postId: String): Flux<Comment>
+
+    fun findAllByPostIdAndDeletedDateIsNullOrderByCreatedDateAsc(postId: String): Flux<Comment>
+
+    fun findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId: String): Flux<Comment>
 }
