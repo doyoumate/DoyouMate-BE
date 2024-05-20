@@ -9,7 +9,9 @@ import com.doyoumate.domain.board.dto.response.PostResponse
 import com.doyoumate.domain.board.exception.BoardNotFoundException
 import com.doyoumate.domain.board.exception.PostNotFoundException
 import com.doyoumate.domain.board.model.Post
+import com.doyoumate.domain.board.model.Writer
 import com.doyoumate.domain.board.repository.BoardRepository
+import com.doyoumate.domain.board.repository.CommentRepository
 import com.doyoumate.domain.board.repository.CustomPostRepository
 import com.doyoumate.domain.board.repository.PostRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
@@ -20,29 +22,31 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 @Service
 class PostService(
     private val postRepository: PostRepository,
     private val customPostRepository: CustomPostRepository,
+    private val commentRepository: CommentRepository,
     private val studentRepository: StudentRepository,
     private val boardRepository: BoardRepository,
 ) {
     fun getPostById(id: String): Mono<PostResponse> =
-        postRepository.findById(id)
+        postRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .map { PostResponse(it) }
 
     fun getPostsByWriterId(writerId: String): Flux<PostResponse> =
-        postRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
+        postRepository.findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId)
             .map { PostResponse(it) }
 
     fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
-        postRepository.findAllByLikedStudentIdsContainsOrderByCreatedDateDesc(studentId)
+        postRepository.findAllByLikedStudentIdsContainsAndDeletedDateIsNullOrderByCreatedDateDesc(studentId)
             .map { PostResponse(it) }
 
     fun getPopularPosts(): Flux<PostResponse> =
-        postRepository.findTop2OrderByLikedStudentIdsSize()
+        postRepository.findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull()
             .map { PostResponse(it) }
 
     fun searchPosts(boardId: String?, content: String, pageable: Pageable): Flux<PostResponse> =
@@ -51,21 +55,23 @@ class PostService(
 
     fun createPost(request: CreatePostRequest, authentication: DefaultJwtAuthentication): Mono<PostResponse> =
         with(request) {
-            Mono.zip(
-                boardRepository.findById(boardId)
-                    .switchIfEmpty(Mono.error(BoardNotFoundException())),
-                studentRepository.findById(authentication.id)
-                    .switchIfEmpty(Mono.error(StudentNotFoundException()))
-            ).flatMap { (board, student) ->
-                postRepository.save(
-                    Post(
-                        board = board,
-                        writer = student,
-                        title = title,
-                        content = content
-                    )
+            boardRepository.findById(boardId)
+                .switchIfEmpty(Mono.error(BoardNotFoundException()))
+                .zipWith(
+                    studentRepository.findById(authentication.id)
+                        .switchIfEmpty(Mono.error(StudentNotFoundException()))
                 )
-            }.map { PostResponse(it) }
+                .flatMap { (board, student) ->
+                    postRepository.save(
+                        Post(
+                            board = board,
+                            writer = Writer(student),
+                            title = title,
+                            content = content
+                        )
+                    )
+                }
+                .map { PostResponse(it) }
         }
 
     fun updatePostById(
@@ -73,7 +79,7 @@ class PostService(
         request: UpdatePostRequest,
         authentication: DefaultJwtAuthentication
     ): Mono<PostResponse> =
-        postRepository.findById(id)
+        postRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
@@ -82,14 +88,26 @@ class PostService(
 
     @Transactional
     fun deletePostById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
-        postRepository.findById(id)
+        postRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
-            .flatMap { postRepository.deleteById(id) }
+            .flatMap {
+                LocalDateTime.now()
+                    .let { now ->
+                        postRepository.save(it.copy(deletedDate = now))
+                            .zipWith(
+                                commentRepository.findAllByPostIdAndDeletedDateIsNull(id)
+                                    .map { it.copy(deletedDate = now) }
+                                    .flatMap { commentRepository.save(it) }
+                                    .then(Mono.just(true))
+                            )
+                    }
+            }
+            .then()
 
     fun likePostById(id: String, authentication: DefaultJwtAuthentication): Mono<PostResponse> =
-        postRepository.findById(id)
+        postRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .map {
                 it.copy(likedStudentIds = it.likedStudentIds.toMutableSet()
