@@ -20,7 +20,7 @@ data class CommentResponse(
                     writer = WriterResponse(writer),
                     content = content,
                     likedStudentIds = likedStudentIds,
-                    createdDate = createdDate
+                    createdDate = createdDate!!
                 )
             }
     }

@@ -33,7 +33,6 @@ class SynchronizeLecturesTasklet(
     override fun write(chunk: Chunk<out Flux<Lecture>>) {
         lectureRepository.saveAll(chunk.items.first())
             .doOnNext { logger.info { it } }
-            .collectList()
-            .block()
+            .blockLast()
     }
 }

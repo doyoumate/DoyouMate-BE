@@ -76,16 +76,14 @@ class AuthenticationService(
 
     fun signUp(request: SignUpRequest): Mono<Void> =
         with(request) {
-            certificationRepository.findByStudentNumber(certification.studentNumber)
-                .filter { it == certification }
+            certificationRepository.findByStudentNumber(studentNumber)
+                .filter { it.code == code }
                 .switchIfEmpty(Mono.error(InvalidCertificationException()))
                 .flatMap {
-                    Mono.zip(
-                        studentRepository.findByNumber(certification.studentNumber)
-                            .flatMap { studentRepository.save(it.copy(password = passwordEncoder.encode(password))) },
-                        certificationRepository.deleteByStudentNumber(certification.studentNumber)
-                    )
+                    studentRepository.findByNumber(studentNumber)
+                        .flatMap { studentRepository.save(it.copy(password = passwordEncoder.encode(password))) }
                 }
+                .zipWith(certificationRepository.deleteByStudentNumber(studentNumber))
                 .then()
         }
 
@@ -103,14 +101,11 @@ class AuthenticationService(
                         roles = setOf(SimpleGrantedAuthority(it.role.name))
                     )
                 }
-                .flatMap {
-                    Mono.zip(
-                        Mono.just(it),
-                        refreshTokenRepository.save(
-                            RefreshToken(
-                                studentId = it.id,
-                                content = jwtProvider.createRefreshToken(it)
-                            )
+                .zipWhen {
+                    refreshTokenRepository.save(
+                        RefreshToken(
+                            studentId = it.id,
+                            content = jwtProvider.createRefreshToken(it)
                         )
                     )
                 }

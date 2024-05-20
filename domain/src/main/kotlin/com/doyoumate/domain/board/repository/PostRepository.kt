@@ -2,27 +2,30 @@ package com.doyoumate.domain.board.repository
 
 import com.doyoumate.domain.board.model.Post
 import org.springframework.data.mongodb.repository.Aggregation
-import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @Repository
 interface PostRepository : ReactiveMongoRepository<Post, String> {
-    @Query("{ 'board.id': ?0 }")
+    fun findByIdAndDeletedDateIsNull(id: String): Mono<Post>
+
     fun findAllByBoardId(boardId: String): Flux<Post>
 
-    @Query("{ 'writer.id': ?0 }", sort = "{ 'createdDate': -1 }")
-    fun findAllByWriterIdOrderByCreatedDateDesc(writerId: String): Flux<Post>
+    fun findAllByBoardIdAndDeletedDateIsNull(boardId: String): Flux<Post>
 
-    fun findAllByLikedStudentIdsContainsOrderByCreatedDateDesc(studentId: String): Flux<Post>
+    fun findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId: String): Flux<Post>
+
+    fun findAllByLikedStudentIdsContainsAndDeletedDateIsNullOrderByCreatedDateDesc(studentId: String): Flux<Post>
 
     @Aggregation(
         pipeline = [
+            "{ \$match: { deletedDate: null } }",
             "{ \$addFields: { count: { \$size: '\$likedStudentIds' } }}",
             "{ \$sort: { count: -1 } }",
             "{ \$limit: 2 }"
         ]
     )
-    fun findTop2OrderByLikedStudentIdsSize(): Flux<Post>
+    fun findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull(): Flux<Post>
 }

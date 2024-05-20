@@ -1,5 +1,6 @@
 dependencies {
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    api("org.springframework.data:spring-data-commons")
     testFixturesImplementation(testFixtures(project(":domain")))
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testFixturesImplementation("org.springframework.restdocs:spring-restdocs-webtestclient")

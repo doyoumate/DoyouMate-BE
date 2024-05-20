@@ -9,6 +9,7 @@ import com.doyoumate.domain.board.dto.response.CommentResponse
 import com.doyoumate.domain.board.exception.CommentNotFoundException
 import com.doyoumate.domain.board.exception.PostNotFoundException
 import com.doyoumate.domain.board.model.Comment
+import com.doyoumate.domain.board.model.Writer
 import com.doyoumate.domain.board.repository.CommentRepository
 import com.doyoumate.domain.board.repository.PostRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 @Service
 class CommentService(
@@ -26,33 +28,35 @@ class CommentService(
     private val studentRepository: StudentRepository
 ) {
     fun getCommentsByPostId(postId: String): Flux<CommentResponse> =
-        commentRepository.findAllByPostIdOrderByCreatedDateAsc(postId)
+        commentRepository.findAllByPostIdAndDeletedDateIsNullOrderByCreatedDateAsc(postId)
             .map { CommentResponse(it) }
 
     fun getCommentsByWriterId(writerId: String): Flux<CommentResponse> =
-        commentRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
+        commentRepository.findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId)
             .map { CommentResponse(it) }
 
     @Transactional
     fun createComment(request: CreateCommentRequest, authentication: DefaultJwtAuthentication): Mono<CommentResponse> =
         with(request) {
-            Mono.zip(
-                studentRepository.findById(authentication.id)
-                    .switchIfEmpty(Mono.error(StudentNotFoundException())),
-                postRepository.findById(postId)
-                    .switchIfEmpty(Mono.error(PostNotFoundException()))
-            ).flatMap { (student, post) ->
-                commentRepository.save(
-                    Comment(
-                        postId = postId,
-                        writer = student,
-                        content = content
-                    )
-                ).flatMap {
-                    postRepository.save(post.copy(commentIds = post.commentIds.apply { add(it.id!!) }))
-                        .thenReturn(it)
+            studentRepository.findById(authentication.id)
+                .switchIfEmpty(Mono.error(StudentNotFoundException()))
+                .zipWhen {
+                    postRepository.findByIdAndDeletedDateIsNull(postId)
+                        .switchIfEmpty(Mono.error(PostNotFoundException()))
                 }
-            }.map { CommentResponse(it) }
+                .flatMap { (student, post) ->
+                    commentRepository.save(
+                        Comment(
+                            postId = postId,
+                            writer = Writer(student),
+                            content = content
+                        )
+                    ).flatMap {
+                        postRepository.save(post.copy(commentIds = post.commentIds.apply { add(it.id!!) }))
+                            .thenReturn(it)
+                    }
+                }
+                .map { CommentResponse(it) }
         }
 
     fun updateCommentById(
@@ -60,7 +64,7 @@ class CommentService(
         request: UpdateCommentRequest,
         authentication: DefaultJwtAuthentication
     ): Mono<CommentResponse> =
-        commentRepository.findById(id)
+        commentRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(CommentNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
@@ -69,20 +73,16 @@ class CommentService(
 
     @Transactional
     fun deleteCommentById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
-        commentRepository.findById(id)
+        commentRepository.findByIdAndDeletedDateIsNull(id)
             .switchIfEmpty(Mono.error(CommentNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { comment ->
-                Mono.zip(
-                    postRepository.findById(comment.postId)
-                        .flatMap {
-                            postRepository.save(it.copy(commentIds = it.commentIds.apply { remove(id) }))
-                                .thenReturn(true)
-                        },
-                    commentRepository.deleteById(id)
-                        .thenReturn(true)
-                )
+                commentRepository.save(comment.copy(deletedDate = LocalDateTime.now()))
+                    .zipWith(
+                        postRepository.findByIdAndDeletedDateIsNull(comment.postId)
+                            .flatMap { postRepository.save(it.copy(commentIds = it.commentIds.apply { remove(id) })) }
+                    )
             }
             .then()
 

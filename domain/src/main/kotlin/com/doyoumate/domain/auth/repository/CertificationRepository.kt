@@ -10,7 +10,7 @@ import java.time.Duration
 @Repository
 class CertificationRepository(
     private val redisTemplate: ReactiveRedisTemplate<String, String>,
-    @Value("\${expire}")
+    @Value("\${certification.expire}")
     private val expire: Long
 ) {
     fun findByStudentNumber(studentNumber: String): Mono<Certification> =
