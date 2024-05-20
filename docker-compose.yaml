@@ -1,0 +1,30 @@
+version: "3.6"
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server --port 6379
+    restart: always
+    ports:
+    - 6379:6379
+  mongo-1:
+    image: mongo
+    container_name: mongodb-1
+    restart: always
+    ports:
+    - "27017:27017"
+    command: mongod --replSet rs --port 27017
+  mongo-2:
+    image: mongo
+    container_name: mongodb-2
+    restart: always
+    ports:
+    - "27018:27018"
+    command: mongod --replSet rs --port 27018
+  mongo-3:
+    image: mongo
+    container_name: mongodb-3
+    restart: always
+    ports:
+    - "27019:27019"
+    command: mongod --replSet rs --port 27019
