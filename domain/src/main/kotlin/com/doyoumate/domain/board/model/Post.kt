@@ -18,5 +18,6 @@ data class Post(
     val commentIds: HashSet<String> = hashSetOf(),
     @Indexed
     @CreatedDate
-    val createdDate: LocalDateTime = LocalDateTime.now()
+    val createdDate: LocalDateTime? = null,
+    val deletedDate: LocalDateTime? = null
 )

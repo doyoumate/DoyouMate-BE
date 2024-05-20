@@ -24,7 +24,7 @@ data class PostResponse(
                     content = content,
                     likedStudentIds = likedStudentIds,
                     commentIds = commentIds,
-                    createdDate = createdDate
+                    createdDate = createdDate!!
                 )
             }
     }
