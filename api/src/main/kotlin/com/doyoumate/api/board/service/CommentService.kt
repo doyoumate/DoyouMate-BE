@@ -15,6 +15,7 @@ import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -32,6 +33,7 @@ class CommentService(
         commentRepository.findAllByWriterIdOrderByCreatedDateDesc(writerId)
             .map { CommentResponse(it) }
 
+    @Transactional
     fun createComment(request: CreateCommentRequest, authentication: DefaultJwtAuthentication): Mono<CommentResponse> =
         with(request) {
             Mono.zip(
@@ -65,6 +67,7 @@ class CommentService(
             .flatMap { commentRepository.save(request.updateEntity(it)) }
             .map { CommentResponse(it) }
 
+    @Transactional
     fun deleteCommentById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
         commentRepository.findById(id)
             .switchIfEmpty(Mono.error(CommentNotFoundException()))

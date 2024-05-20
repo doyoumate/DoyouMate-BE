@@ -8,6 +8,7 @@ import com.doyoumate.domain.board.exception.BoardNotFoundException
 import com.doyoumate.domain.board.repository.BoardRepository
 import com.doyoumate.domain.board.repository.PostRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -24,6 +25,7 @@ class BoardService(
         boardRepository.save(request.toEntity())
             .map { BoardResponse(it) }
 
+    @Transactional
     fun updateBoardById(id: String, request: UpdateBoardRequest): Mono<BoardResponse> =
         boardRepository.findById(id)
             .switchIfEmpty(Mono.error(BoardNotFoundException()))
@@ -38,6 +40,7 @@ class BoardService(
             }
             .map { (board) -> BoardResponse(board) }
 
+    @Transactional
     fun deleteBoardById(id: String): Mono<Void> =
         boardRepository.findById(id)
             .switchIfEmpty(Mono.error(BoardNotFoundException()))

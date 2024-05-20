@@ -17,6 +17,7 @@ import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -79,6 +80,7 @@ class PostService(
             .flatMap { postRepository.save(request.updateEntity(it)) }
             .map { PostResponse(it) }
 
+    @Transactional
     fun deletePostById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
         postRepository.findById(id)
             .switchIfEmpty(Mono.error(PostNotFoundException()))
