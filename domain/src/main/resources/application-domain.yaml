@@ -1,41 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+    redis:
+      url: ${REDIS_URL}
+certification:
+  expire: ${CERTIFICATION_EXPIRE}
 api:
-  uri: https://suwings.syu.ac.kr/websquare/engine/proworks/callServletService.jsp
----
-spring:
-  config:
-    activate:
-      on-profile: local
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/doyoumate
-    redis:
-      host: localhost
-      port: 6379
-certification:
-  expire: 10
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-certification:
-  expire: ${CERTIFICATION_EXPIRE}
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-certification:
-  expire: ${CERTIFICATION_EXPIRE}
+  uri: ${API_URI}
