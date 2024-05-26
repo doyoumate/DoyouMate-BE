@@ -3,6 +3,7 @@ package com.doyoumate.common.logging
 import com.doyoumate.common.util.getLogger
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
+import org.springframework.http.MediaType
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator
 import org.springframework.http.server.reactive.ServerHttpResponse
@@ -53,10 +54,11 @@ class LoggingFilter : WebFilter {
         request.apply {
             logger.info {
                 "HTTP $method ${uri.run { "$path${query?.let { "?$it" } ?: ""}" }} ${
-                    String(body)
-                        .replace(Regex("[ \\n]"), "")
-                        .replace(",", ", ")
-                        .trim()
+                    if (request.headers.contentType == MediaType.APPLICATION_JSON)
+                        String(body)
+                            .replace(Regex("[ \\n]"), "")
+                            .replace(",", ", ")
+                            .trim() else ""
                 }"
             }
         }
