@@ -11,6 +11,7 @@ data class PostResponse(
     val content: String,
     val likedStudentIds: Set<String>,
     val commentIds: Set<String>,
+    val images: List<String>,
     val createdDate: LocalDateTime
 ) {
     companion object {
@@ -24,6 +25,7 @@ data class PostResponse(
                     content = content,
                     likedStudentIds = likedStudentIds,
                     commentIds = commentIds,
+                    images = images,
                     createdDate = createdDate!!
                 )
             }

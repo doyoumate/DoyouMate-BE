@@ -1,5 +1,6 @@
 package com.doyoumate.api.board.service
 
+import com.doyoumate.api.global.s3.S3Provider
 import com.doyoumate.common.util.component1
 import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.exception.PermissionDeniedException
@@ -31,6 +32,7 @@ class PostService(
     private val commentRepository: CommentRepository,
     private val studentRepository: StudentRepository,
     private val boardRepository: BoardRepository,
+    private val s3Provider: S3Provider
 ) {
     fun getPostById(id: String): Mono<PostResponse> =
         postRepository.findByIdAndDeletedDateIsNull(id)
@@ -62,14 +64,20 @@ class PostService(
                         .switchIfEmpty(Mono.error(StudentNotFoundException()))
                 )
                 .flatMap { (board, student) ->
-                    postRepository.save(
-                        Post(
-                            board = board,
-                            writer = Writer(student),
-                            title = title,
-                            content = content
-                        )
-                    )
+                    Flux.merge(images.map { s3Provider.upload(it.filename(), it) })
+                        .collectList()
+                        .defaultIfEmpty(emptyList())
+                        .flatMap {
+                            postRepository.save(
+                                Post(
+                                    board = board,
+                                    writer = Writer(student),
+                                    title = title,
+                                    content = content,
+                                    images = it
+                                )
+                            )
+                        }
                 }
                 .map { PostResponse(it) }
         }

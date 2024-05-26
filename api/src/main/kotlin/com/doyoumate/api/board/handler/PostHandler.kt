@@ -8,6 +8,7 @@ import com.doyoumate.common.util.getPageable
 import com.doyoumate.common.util.getQueryParam
 import com.doyoumate.domain.board.dto.request.CreatePostRequest
 import com.doyoumate.domain.board.dto.request.UpdatePostRequest
+import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
@@ -55,7 +56,9 @@ class PostHandler(
 
     fun createPost(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
-            Mono.zip(bodyToMono<CreatePostRequest>(), getAuthentication())
+            body(BodyExtractors.toMultipartData())
+                .map { CreatePostRequest(it) }
+                .zipWith(getAuthentication())
                 .flatMap { (createPostRequest, authentication) ->
                     ServerResponse.ok()
                         .body(postService.createPost(createPostRequest, authentication))
