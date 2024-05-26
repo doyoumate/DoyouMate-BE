@@ -1,8 +1,8 @@
 package com.doyoumate.common.logging
 
 import com.doyoumate.common.util.getLogger
+import com.doyoumate.common.util.toByteArray
 import org.springframework.core.io.buffer.DataBuffer
-import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.MediaType
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator
@@ -21,7 +21,8 @@ class LoggingFilter : WebFilter {
             .flatMap { chain.filter(it) }
 
     private fun ServerWebExchange.log(): Mono<ServerWebExchange> =
-        request.bodyToByteArray()
+        request.body
+            .toByteArray()
             .doOnNext { loggingRequest(request, it) }
             .map {
                 mutate()
@@ -40,15 +41,6 @@ class LoggingFilter : WebFilter {
                     })
                     .build()
             }
-
-    private fun ServerHttpRequest.bodyToByteArray(): Mono<ByteArray> =
-        DataBufferUtils
-            .join(this.body)
-            .map { buffer ->
-                ByteArray(buffer.readableByteCount())
-                    .also { DataBufferUtils.release(buffer.read(it)) }
-            }
-            .defaultIfEmpty(ByteArray(0))
 
     private fun loggingRequest(request: ServerHttpRequest, body: ByteArray) {
         request.apply {
