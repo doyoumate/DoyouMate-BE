@@ -16,6 +16,7 @@ data class Post(
     val content: String,
     val likedStudentIds: HashSet<String> = hashSetOf(),
     val commentIds: HashSet<String> = hashSetOf(),
+    val images: List<String>,
     @Indexed
     @CreatedDate
     val createdDate: LocalDateTime? = null,
