@@ -1,5 +1,6 @@
 package com.doyoumate.api.student.service
 
+import com.doyoumate.domain.student.dto.response.AppliedStudentResponse
 import com.doyoumate.domain.student.dto.response.StudentResponse
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
@@ -9,18 +10,18 @@ import reactor.core.publisher.Mono
 
 @Service
 class StudentService(
-    private val studentRepository: StudentRepository,
+    private val studentRepository: StudentRepository
 ) {
     fun getStudentById(id: String): Mono<StudentResponse> =
         studentRepository.findById(id)
             .switchIfEmpty(Mono.error(StudentNotFoundException()))
             .map { StudentResponse(it) }
 
-    fun getAppliedStudentsByLectureId(lectureId: String): Flux<StudentResponse> =
+    fun getAppliedStudentsByLectureId(lectureId: String): Flux<AppliedStudentResponse> =
         studentRepository.findAllByAppliedLectureIdsContains(lectureId)
-            .map { StudentResponse(it) }
+            .map { AppliedStudentResponse(it) }
 
-    fun getPreAppliedStudentsByLectureId(lectureId: String): Flux<StudentResponse> =
+    fun getPreAppliedStudentsByLectureId(lectureId: String): Flux<AppliedStudentResponse> =
         studentRepository.findAllByPreAppliedLectureIdsContains(lectureId)
-            .map { StudentResponse(it) }
+            .map { AppliedStudentResponse(it) }
 }
