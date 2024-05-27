@@ -15,9 +15,9 @@ data class CreatePostRequest(
         operator fun invoke(multipartData: MultiValueMap<String, Part>): CreatePostRequest =
             with(multipartData) {
                 CreatePostRequest(
-                    boardId = (get("boardId")?.first() as FormFieldPart).value(),
-                    title = (get("title")?.first() as FormFieldPart).value(),
-                    content = (get("content")?.first() as FormFieldPart).value(),
+                    boardId = (get("boardId")!!.first() as FormFieldPart).value(),
+                    title = (get("title")!!.first() as FormFieldPart).value(),
+                    content = (get("content")!!.first() as FormFieldPart).value(),
                     images = (get("images") ?: emptyList()) as List<FilePart>
                 )
             }
