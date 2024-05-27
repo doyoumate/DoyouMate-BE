@@ -23,6 +23,7 @@ class LoggingFilter : WebFilter {
     private fun ServerWebExchange.log(): Mono<ServerWebExchange> =
         request.body
             .toByteArray()
+            .defaultIfEmpty(ByteArray(0))
             .doOnNext { loggingRequest(request, it) }
             .map {
                 mutate()
