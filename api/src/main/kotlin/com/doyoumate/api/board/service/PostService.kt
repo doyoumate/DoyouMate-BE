@@ -58,29 +58,32 @@ class PostService(
         customPostRepository.search(boardId, content, pageable)
             .map { PostResponse(it) }
 
+    @Transactional
     fun createPost(request: CreatePostRequest, authentication: DefaultJwtAuthentication): Mono<PostResponse> =
         with(request) {
             boardRepository.findById(boardId)
                 .switchIfEmpty(Mono.error(BoardNotFoundException()))
-                .zipWith(
+                .zipWhen {
                     studentRepository.findById(authentication.id)
                         .switchIfEmpty(Mono.error(StudentNotFoundException()))
-                )
+                }
                 .flatMap { (board, student) ->
-                    Flux.merge(images.map { s3Provider.upload(it.filename(), it) })
-                        .collectList()
+                    postRepository.save(
+                        Post(
+                            board = board,
+                            writer = Writer(student),
+                            title = title,
+                            content = content,
+                            images = emptyList()
+                        )
+                    )
+                }
+                .flatMap { post ->
+                    Flux.merge(images.map { image ->
+                        s3Provider.upload(createObjectKey(post.id!!, "images/${UUID.randomUUID()}"), image)
+                    }).collectList()
                         .defaultIfEmpty(emptyList())
-                        .flatMap {
-                            postRepository.save(
-                                Post(
-                                    board = board,
-                                    writer = Writer(student),
-                                    title = title,
-                                    content = content,
-                                    images = it
-                                )
-                            )
-                        }
+                        .flatMap { postRepository.save(post.copy(images = it)) }
                 }
                 .map { PostResponse(it) }
         }
