@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component3
+import java.net.URI
 import java.time.LocalDateTime
+import java.util.*
 
 @Service
 class PostService(
@@ -87,12 +90,24 @@ class PostService(
         request: UpdatePostRequest,
         authentication: DefaultJwtAuthentication
     ): Mono<PostResponse> =
-        postRepository.findByIdAndDeletedDateIsNull(id)
-            .switchIfEmpty(Mono.error(PostNotFoundException()))
-            .filter { it.writer.id == authentication.id }
-            .switchIfEmpty(Mono.error(PermissionDeniedException()))
-            .flatMap { postRepository.save(request.updateEntity(it)) }
-            .map { PostResponse(it) }
+        with(request) {
+            postRepository.findByIdAndDeletedDateIsNull(id)
+                .switchIfEmpty(Mono.error(PostNotFoundException()))
+                .filter { it.writer.id == authentication.id }
+                .switchIfEmpty(Mono.error(PermissionDeniedException()))
+                .flatMap { post ->
+                    Mono.zip(
+                        s3Provider.deleteAll(post.images.map { URI.create(it) })
+                            .thenReturn(true),
+                        Flux.merge(images.map {
+                            s3Provider.upload(createObjectKey(id, "images/${UUID.randomUUID()}"), it)
+                        }).collectList()
+                            .defaultIfEmpty(emptyList()),
+                        boardRepository.findById(boardId)
+                    ).flatMap { (_, images, board) -> postRepository.save(updateEntity(post, board, images)) }
+                }
+                .map { PostResponse(it) }
+        }
 
     @Transactional
     fun deletePostById(id: String, authentication: DefaultJwtAuthentication): Mono<Void> =
@@ -131,4 +146,6 @@ class PostService(
             }
             .flatMap { postRepository.save(it) }
             .map { PostResponse(it) }
+
+    private fun createObjectKey(id: String, key: String) = "images/${id}/${key}"
 }
