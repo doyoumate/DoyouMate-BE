@@ -13,6 +13,8 @@ aws:
   s3:
     bucket: ${S3_BUCKET}
     region: ${S3_REGION}
+  cloudFront:
+    domain: ${CLOUD_FRONT_DOMAIN}
 jwt:
   secret: ${JWT_SECRET}
   accessTokenExpire: ${JWT_ACCESS_EXPIRE}

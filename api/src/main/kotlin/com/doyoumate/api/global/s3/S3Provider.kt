@@ -19,8 +19,8 @@ class S3Provider(
     private val s3Client: S3AsyncClient,
     @Value("\${aws.s3.bucket}")
     private val bucket: String,
-    @Value("\${aws.s3.region}")
-    private val region: String
+    @Value("\${aws.cloudFront.domain}")
+    private val domain: String
 ) {
     fun upload(key: String, filePart: FilePart): Mono<String> =
         getPutObjectRequest(bucket, key, filePart)
@@ -32,7 +32,7 @@ class S3Provider(
                     s3Client.putObject(request, AsyncRequestBody.fromBytes(bytes))
                 )
             }
-            .map { createUri(bucket, region, key) }
+            .map { createUri(key) }
 
     private fun getPutObjectRequest(bucket: String, key: String, filePart: FilePart): Mono<PutObjectRequest> =
         DataBufferUtils
@@ -46,6 +46,5 @@ class S3Provider(
                     .build()
             }
 
-    private fun createUri(bucket: String, region: String, key: String) =
-        "https://${bucket}.s3.${region}.amazonaws.com/${key}"
+    private fun createUri(key: String) = "https://${domain}/${key}"
 }
