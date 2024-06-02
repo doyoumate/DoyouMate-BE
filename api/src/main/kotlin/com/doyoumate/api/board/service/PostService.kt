@@ -80,7 +80,7 @@ class PostService(
                 }
                 .flatMap { post ->
                     Flux.merge(images.map { image ->
-                        s3Provider.upload(createObjectKey(post.id!!, "images/${UUID.randomUUID()}"), image)
+                        s3Provider.upload(createObjectKey(post.id!!), image)
                     }).collectList()
                         .defaultIfEmpty(emptyList())
                         .flatMap { postRepository.save(post.copy(images = it)) }
@@ -103,7 +103,7 @@ class PostService(
                         s3Provider.deleteAll(post.images.map { URI.create(it) })
                             .thenReturn(true),
                         Flux.merge(images.map {
-                            s3Provider.upload(createObjectKey(id, "images/${UUID.randomUUID()}"), it)
+                            s3Provider.upload(createObjectKey(id), it)
                         }).collectList()
                             .defaultIfEmpty(emptyList()),
                         boardRepository.findById(boardId)
@@ -150,5 +150,5 @@ class PostService(
             .flatMap { postRepository.save(it) }
             .map { PostResponse(it) }
 
-    private fun createObjectKey(id: String, key: String) = "images/${id}/${key}"
+    private fun createObjectKey(id: String) = "images/${id}/${UUID.randomUUID()}"
 }
