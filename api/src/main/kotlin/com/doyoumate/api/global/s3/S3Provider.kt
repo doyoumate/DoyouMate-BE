@@ -11,7 +11,11 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
+import software.amazon.awssdk.services.s3.model.Delete
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import java.net.URI
 import kotlin.math.pow
 
 @Component
@@ -23,7 +27,7 @@ class S3Provider(
     private val domain: String
 ) {
     fun upload(key: String, filePart: FilePart): Mono<String> =
-        getPutObjectRequest(bucket, key, filePart)
+        getPutObjectRequest(key, filePart)
             .zipWith(filePart.content().toByteArray())
             .filter { (_, bytes) -> (bytes.size / (2.0.pow(20))) <= 1 }
             .switchIfEmpty(Mono.error(ImageOverSizeException()))
@@ -34,7 +38,14 @@ class S3Provider(
             }
             .map { createUri(key) }
 
-    private fun getPutObjectRequest(bucket: String, key: String, filePart: FilePart): Mono<PutObjectRequest> =
+    fun deleteAll(uris: List<URI>): Mono<Void> =
+        Mono.just(uris)
+            .filter { it.isNotEmpty() }
+            .map { getDeleteObjectsRequest(uris.map { getObjectKey(it) }) }
+            .flatMap { Mono.fromFuture(s3Client.deleteObjects(it)) }
+            .then()
+
+    private fun getPutObjectRequest(key: String, filePart: FilePart): Mono<PutObjectRequest> =
         DataBufferUtils
             .join(filePart.content())
             .map {
@@ -46,5 +57,23 @@ class S3Provider(
                     .build()
             }
 
-    private fun createUri(key: String) = "https://${domain}/${key}"
+    private fun getDeleteObjectsRequest(keys: List<String>): DeleteObjectsRequest =
+        DeleteObjectsRequest.builder()
+            .bucket(bucket)
+            .delete(Delete.builder()
+                .objects(
+                    keys.map {
+                        ObjectIdentifier
+                            .builder()
+                            .key(it)
+                            .build()
+                    }
+                )
+                .build()
+            )
+            .build()
+
+    private fun createUri(key: String): String = "https://${domain}/${key}"
+
+    private fun getObjectKey(uri: URI): String = uri.path.trimStart('/')
 }
