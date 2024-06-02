@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
-import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component2
 
@@ -67,7 +66,9 @@ class PostHandler(
 
     fun updatePostById(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
-            Mono.zip(bodyToMono<UpdatePostRequest>(), getAuthentication())
+            body(BodyExtractors.toMultipartData())
+                .map { UpdatePostRequest(it) }
+                .zipWith(getAuthentication())
                 .flatMap { (updatePostRequest, authentication) ->
                     ServerResponse.ok()
                         .body(postService.updatePostById(pathVariable("id"), updatePostRequest, authentication))

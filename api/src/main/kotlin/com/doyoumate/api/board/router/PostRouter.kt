@@ -21,7 +21,7 @@ class PostRouter {
                 GET("/popular", handler::getPopularPosts)
                 GET("/{id}", handler::getPostById)
                 POST("", contentType(MediaType.MULTIPART_FORM_DATA), handler::createPost)
-                PUT("/{id}", handler::updatePostById)
+                PUT("/{id}", contentType(MediaType.MULTIPART_FORM_DATA), handler::updatePostById)
                 PATCH("/{id}/like", handler::likePostById)
                 DELETE("/{id}", handler::deletePostById)
             }
