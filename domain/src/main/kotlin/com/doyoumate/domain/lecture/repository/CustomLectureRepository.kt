@@ -1,9 +1,11 @@
 package com.doyoumate.domain.lecture.repository
 
+import com.doyoumate.domain.global.util.sortBy
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Query
@@ -35,6 +37,7 @@ class CustomLectureRepository(
                 addCriteria(Lecture::name.regex(name, "i"))
                 credit?.let { addCriteria(Lecture::credit isEqualTo it) }
                 section?.let { addCriteria(Lecture::section isEqualTo it) }
+                with(Lecture::id.sortBy(Sort.Direction.ASC))
                 with(pageable)
             }
             .let { mongoTemplate.find(it) }
