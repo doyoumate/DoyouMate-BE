@@ -89,10 +89,16 @@ class CommentService(
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { comment ->
                 commentRepository.save(comment.copy(deletedDate = LocalDateTime.now()))
-                    .zipWith(
-                        postRepository.findByIdAndDeletedDateIsNull(comment.postId)
-                            .flatMap { postRepository.save(it.copy(commentIds = it.commentIds.apply { remove(id) })) }
+                    .mergeWith(
+                        commentRepository.findAllByCommentIdAndDeletedDateIsNull(comment.id!!)
+                            .flatMap { commentRepository.save(it.copy(deletedDate = LocalDateTime.now())) }
                     )
+                    .map { it.id!! }
+                    .collectSet()
+                    .zipWith(postRepository.findByIdAndDeletedDateIsNull(comment.postId))
+            }
+            .flatMap { (ids, post) ->
+                postRepository.save(post.copy(commentIds = post.commentIds.apply { removeAll(ids) }))
             }
             .then()
 
