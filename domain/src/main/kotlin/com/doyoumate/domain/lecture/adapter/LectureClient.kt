@@ -23,37 +23,16 @@ class LectureClient(
     private val xmlMapper: XmlMapper
 ) {
     fun getLecturesByYearAndSemester(year: Int, semester: Semester): Flux<Lecture> =
-        """
-            <rqM0_F0 task="system.commonTask" action="comSelect" xda="academic.ac.ac03.ac03_20040305_m_M0_F0_xda" con="sudev">
-            	<FCLT_GSCH_DIV_CD value="1"/>
-            	<OPEN_YY value="$year"/>
-            	<OPEN_SHTM_CD value="${semester.id}"/>
-            	<LANG_GUBUN value="K"/>
-            </rqM0_F0>
-        """.let {
-            webClient.post()
-                .contentType(MediaType.APPLICATION_XML)
-                .bodyValue(it)
-                .retrieve()
-                .bodyToMono<String>()
-        }.flatMapMany { xmlMapper.getRows(it) }
-            .map {
-                it.run {
-                    Lecture(
-                        id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
-                        year = getValue("OPEN_YY"),
-                        grade = getValue("EDUCUR_CORS_SHYS_CD"),
-                        semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
-                        major = getValue("ORGN4_NM"),
-                        name = getValue("SBJT_NM"),
-                        professor = getValue("FNM"),
-                        room = getValue("LT_ROOM_NM"),
-                        date = getValue("LTTM"),
-                        credit = getValue("LCTPT"),
-                        section = getValue<String>("CTNCCH_FLD_DIV_CD")
-                            .run { if (isBlank()) null else Section(toInt()) }
-                    )
-                }
+        webClient.post()
+            .contentType(MediaType.APPLICATION_XML)
+            .bodyValue(SuwingsRequests.getLecturesRequest(year, semester))
+            .retrieve()
+            .bodyToMono<String>()
+            .flatMapMany { xmlMapper.getRows(it) }
+            .delayElements(Duration.ofMillis(10))
+            .flatMap { node ->
+                getPlan(node)
+                    .map { Lecture(node, it) }
             }
 
     fun getAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
@@ -73,4 +52,13 @@ class LectureClient(
             .bodyToMono<String>()
             .flatMapMany { xmlMapper.getRows(it) }
             .map { it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO") }
+
+    private fun getPlan(node: JsonNode): Mono<Plan> =
+        webClient.post()
+            .contentType(MediaType.APPLICATION_XML)
+            .bodyValue(SuwingsRequests.getPlanRequest(node))
+            .retrieve()
+            .bodyToMono<String>()
+            .flatMap { xmlMapper.getRow(it) }
+            .map { Plan(it) }
 }
