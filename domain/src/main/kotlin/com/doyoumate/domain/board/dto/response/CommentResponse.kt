@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 data class CommentResponse(
     val id: String,
     val postId: String,
+    val commentId: String?,
     val writer: WriterResponse,
     val content: String,
     val likedStudentIds: Set<String>,
@@ -17,6 +18,7 @@ data class CommentResponse(
                 CommentResponse(
                     id = id!!,
                     postId = postId,
+                    commentId = commentId,
                     writer = WriterResponse(writer),
                     content = content,
                     likedStudentIds = likedStudentIds,

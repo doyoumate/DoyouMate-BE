@@ -1,5 +1,6 @@
 package com.doyoumate.api.board.service
 
+import com.doyoumate.common.util.collectSet
 import com.doyoumate.common.util.component1
 import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.exception.PermissionDeniedException
@@ -45,16 +46,25 @@ class CommentService(
                         .switchIfEmpty(Mono.error(PostNotFoundException()))
                 }
                 .flatMap { (student, post) ->
-                    commentRepository.save(
-                        Comment(
-                            postId = postId,
-                            writer = Writer(student),
-                            content = content
+                    Mono.justOrEmpty(commentId)
+                        .flatMap {
+                            commentRepository.findById(it!!)
+                                .switchIfEmpty(Mono.error(CommentNotFoundException()))
+                        }
+                        .then(
+                            commentRepository.save(
+                                Comment(
+                                    postId = postId,
+                                    commentId = commentId,
+                                    writer = Writer(student),
+                                    content = content
+                                )
+                            )
                         )
-                    ).flatMap {
-                        postRepository.save(post.copy(commentIds = post.commentIds.apply { add(it.id!!) }))
-                            .thenReturn(it)
-                    }
+                        .flatMap {
+                            postRepository.save(post.copy(commentIds = post.commentIds.apply { add(it.id!!) }))
+                                .thenReturn(it)
+                        }
                 }
                 .map { CommentResponse(it) }
         }
@@ -79,10 +89,16 @@ class CommentService(
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
             .flatMap { comment ->
                 commentRepository.save(comment.copy(deletedDate = LocalDateTime.now()))
-                    .zipWith(
-                        postRepository.findByIdAndDeletedDateIsNull(comment.postId)
-                            .flatMap { postRepository.save(it.copy(commentIds = it.commentIds.apply { remove(id) })) }
+                    .mergeWith(
+                        commentRepository.findAllByCommentIdAndDeletedDateIsNull(comment.id!!)
+                            .flatMap { commentRepository.save(it.copy(deletedDate = LocalDateTime.now())) }
                     )
+                    .map { it.id!! }
+                    .collectSet()
+                    .zipWith(postRepository.findByIdAndDeletedDateIsNull(comment.postId))
+            }
+            .flatMap { (ids, post) ->
+                postRepository.save(post.copy(commentIds = post.commentIds.apply { removeAll(ids) }))
             }
             .then()
 
