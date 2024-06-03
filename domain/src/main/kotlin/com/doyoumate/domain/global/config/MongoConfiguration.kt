@@ -1,5 +1,7 @@
 package com.doyoumate.domain.global.config
 
+import com.mongodb.ReadPreference
+import com.mongodb.TransactionOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory
@@ -12,6 +14,13 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @Configuration
 class MongoConfiguration {
     @Bean
-    fun mongoTransactionManager(reactiveMongoDatabaseFactory: ReactiveMongoDatabaseFactory):
-        ReactiveMongoTransactionManager = ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory)
+    fun mongoTransactionManager(reactiveMongoDatabaseFactory: ReactiveMongoDatabaseFactory): ReactiveMongoTransactionManager =
+        ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory)
+            .apply {
+                setOptions(
+                    TransactionOptions.builder()
+                        .readPreference(ReadPreference.primary())
+                        .build()
+                )
+            }
 }
