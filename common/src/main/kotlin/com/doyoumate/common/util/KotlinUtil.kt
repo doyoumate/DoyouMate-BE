@@ -18,3 +18,5 @@ operator fun <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>.component3(): T3 = t3
 operator fun <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>.component4(): T4 = t4
 
 fun <T> Flux<T>.collectSet(): Mono<Set<T>> = collectList().map { it.toSet() }
+
+fun <T> Flux<T>.collectHashSet(): Mono<HashSet<T>> = collectList().map { it.toHashSet() }
