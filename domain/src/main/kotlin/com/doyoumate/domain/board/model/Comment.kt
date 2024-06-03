@@ -11,6 +11,7 @@ data class Comment(
     @Id
     val id: String? = null,
     val postId: String,
+    val commentId: String? = null,
     val writer: Writer,
     val content: String,
     val likedStudentIds: HashSet<String> = hashSetOf(),
