@@ -1,7 +1,6 @@
 package com.doyoumate.domain.lecture.dto.response
 
 import com.doyoumate.domain.lecture.model.Lecture
-import com.doyoumate.domain.lecture.model.Plan
 
 data class LectureResponse(
     val id: String,
@@ -15,7 +14,7 @@ data class LectureResponse(
     val date: String,
     val credit: Int,
     val section: String?,
-    val plan: Plan
+    val plan: PlanResponse
 ) {
     companion object {
         operator fun invoke(lecture: Lecture): LectureResponse =
@@ -32,7 +31,7 @@ data class LectureResponse(
                     date = date,
                     credit = credit,
                     section = section?.sectionName,
-                    plan = plan
+                    plan = PlanResponse(plan)
                 )
             }
     }
