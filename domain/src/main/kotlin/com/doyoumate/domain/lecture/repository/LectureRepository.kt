@@ -30,4 +30,19 @@ interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
         ]
     )
     fun getFilter(): Mono<Filter>
+
+    @Aggregation(
+        pipeline = [
+            """
+            { 
+                ${'$'}group: { 
+                    _id: null, 
+                    professorIds: { ${'$'}addToSet: '${'$'}professorId' },
+                } 
+            }
+            """,
+            "{ \$unwind: '\$professorIds' }"
+        ]
+    )
+    fun getProfessorIds(): Flux<String>
 }
