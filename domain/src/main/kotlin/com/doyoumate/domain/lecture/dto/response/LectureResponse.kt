@@ -4,12 +4,13 @@ import com.doyoumate.domain.lecture.model.Lecture
 
 data class LectureResponse(
     val id: String,
+    val professorId: String,
     val year: Int,
     val grade: Int,
     val semester: String,
     val major: String,
     val name: String,
-    val professor: String,
+    val professorName: String,
     val room: String,
     val date: String,
     val credit: Int,
@@ -21,12 +22,13 @@ data class LectureResponse(
             with(lecture) {
                 LectureResponse(
                     id = id,
+                    professorId = professorId,
                     year = year,
                     grade = grade,
                     semester = semester.semesterName,
                     major = major,
                     name = name,
-                    professor = professor,
+                    professorName = professorName,
                     room = room,
                     date = date,
                     credit = credit,

@@ -39,12 +39,13 @@ class LectureClient(
                         with(node) {
                             Lecture(
                                 id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
+                                professorId = getValue<String>("STF_NO"),
                                 year = getValue("OPEN_YY"),
                                 grade = getValue("EDUCUR_CORS_SHYS_CD"),
                                 semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
                                 major = getValue("ORGN4_NM"),
                                 name = getValue("SBJT_NM"),
-                                professor = getValue("FNM"),
+                                professorName = getValue("FNM"),
                                 room = getValue("LT_ROOM_NM"),
                                 date = getValue("LTTM"),
                                 credit = getValue("LCTPT"),
