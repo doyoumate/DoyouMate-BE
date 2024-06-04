@@ -9,12 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Lecture(
     @Id
     val id: String,
+    val professorId: String,
     val year: Int,
     val grade: Int,
     val semester: Semester,
     val major: String,
     val name: String,
-    val professor: String,
+    val professorName: String,
     val room: String,
     val date: String,
     val credit: Int,
