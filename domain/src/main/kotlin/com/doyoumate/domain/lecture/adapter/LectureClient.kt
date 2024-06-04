@@ -7,6 +7,9 @@ import com.doyoumate.common.util.getValue
 import com.doyoumate.domain.global.util.SuwingsRequests
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.Plan
+import com.doyoumate.domain.lecture.model.Ratio
+import com.doyoumate.domain.lecture.model.enum.Evaluation
+import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
@@ -32,7 +35,26 @@ class LectureClient(
             .delayElements(Duration.ofMillis(10))
             .flatMap { node ->
                 getPlan(node)
-                    .map { Lecture(node, it) }
+                    .map {
+                        with(node) {
+                            Lecture(
+                                id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
+                                year = getValue("OPEN_YY"),
+                                grade = getValue("EDUCUR_CORS_SHYS_CD"),
+                                semester = Semester(getValue<Int>("OPEN_SHTM_CD")),
+                                major = getValue("ORGN4_NM"),
+                                name = getValue("SBJT_NM"),
+                                professor = getValue("FNM"),
+                                room = getValue("LT_ROOM_NM"),
+                                date = getValue("LTTM"),
+                                credit = getValue("LCTPT"),
+                                section = getValue<String>("CTNCCH_FLD_DIV_CD").run {
+                                    if (isBlank()) null else Section(toInt())
+                                },
+                                plan = it
+                            )
+                        }
+                    }
             }
 
     fun getAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
@@ -60,5 +82,17 @@ class LectureClient(
             .retrieve()
             .bodyToMono<String>()
             .flatMap { xmlMapper.getRow(it) }
-            .map { Plan(it) }
+            .map {
+                Plan(
+                    ratio = Ratio(
+                        theory = it.getValue<String>("THEORY_WKHS").ifBlank { "0" }.toInt(),
+                        practice = it.getValue<String>("PRAC_WKHS").ifBlank { "0" }.toInt()
+                    ),
+                    overview = it.getValue("LT_PURP_SMRY_CTNT"),
+                    objective = it.getValue("LRN_TGET_CTNT"),
+                    type = it.getValue("SBJT_CLSF_CD"),
+                    evaluation = Evaluation(it.getValue<String>("LSRT_EVAL_DIV_CD")),
+                    prerequisites = it.getValue("PRE_LRN_CTNT")
+                )
+            }
 }
