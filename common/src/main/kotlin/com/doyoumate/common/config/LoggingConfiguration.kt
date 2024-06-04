@@ -5,6 +5,7 @@ import com.doyoumate.common.logging.MdcContextLifter
 import com.doyoumate.common.logging.MdcFilter
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
@@ -12,6 +13,7 @@ import reactor.core.publisher.Hooks
 import reactor.core.publisher.Operators
 
 @Configuration
+@ConditionalOnExpression("'\${logging.level.web}' != 'debug' and '\${logging.level.web}' != 'trace'")
 class LoggingConfiguration {
     private val key = LoggingConfiguration::class.java.name
 
