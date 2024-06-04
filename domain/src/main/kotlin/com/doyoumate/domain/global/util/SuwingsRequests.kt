@@ -104,4 +104,25 @@ object SuwingsRequests {
 				<EDUCUR_CORS_NO value="${node.getValue<String>("EDUCUR_CORS_NO")}"/>
             </rqM0_F0>
         """
+
+    fun getProfessorRequest(id: String): String =
+        """
+            <rqSelectUserInfo task="system.commonTask" action="comSelect" xda="system.selectUserInfoXDA" con="sudev">
+    			<USER_NO value="$id"/>
+    		</rqSelectUserInfo>
+        """
+
+    fun getScoreRequest(id: String): String =
+        LocalDate.now()
+            .let {
+                """
+                    <rqM0_F0 task="system.commonTask" action="comSelect" xda="academic.ac.popup.ac03_20040305_p_M0_F0_xda" con="sudev"> 
+				        <FCLT_GSCH_DIV_CD value="1"/> 
+				        <OPEN_YY value="${it.year}"/>
+				        <OPEN_SHTM_CD value="${Semester(it).id}"/>
+				        <STF_NO value="$id"/>
+			        </rqM0_F0>
+                """
+            }
+
 }
