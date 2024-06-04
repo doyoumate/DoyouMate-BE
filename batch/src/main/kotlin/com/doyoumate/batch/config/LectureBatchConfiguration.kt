@@ -16,8 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager
 class LectureBatchConfiguration(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
-
-    ) {
+) {
     @Bean
     fun updateLecturesJob(
         webClientLecturesReader: WebClientLecturesReader,
