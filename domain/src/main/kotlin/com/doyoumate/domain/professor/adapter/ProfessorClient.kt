@@ -34,7 +34,7 @@ class ProfessorClient(
                         name = getValue("NM"),
                         phoneNumber = getValue("HP_NO"),
                         email = getValue("E_MAIL"),
-                        score = score,
+                        score = score.takeIf { it != 0f },
                         role = getValue("POSITION_NM")
                     )
                 }
