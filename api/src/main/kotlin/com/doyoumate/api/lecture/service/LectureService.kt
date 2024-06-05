@@ -9,7 +9,6 @@ import com.doyoumate.domain.lecture.repository.LectureRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.DefaultJwtAuthentication
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -32,9 +31,10 @@ class LectureService(
         name: String,
         credit: Int?,
         section: Section?,
-        pageable: Pageable
+        lastId: String?,
+        size: Int
     ): Flux<LectureResponse> =
-        customLectureRepository.search(year, grade, semester, major, name, credit, section, pageable)
+        customLectureRepository.search(year, grade, semester, major, name, credit, section, lastId, size)
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =

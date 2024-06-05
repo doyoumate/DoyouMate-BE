@@ -4,12 +4,12 @@ import com.doyoumate.domain.global.util.sortBy
 import com.doyoumate.domain.lecture.model.Lecture
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
+import org.springframework.data.mongodb.core.query.lt
 import org.springframework.data.mongodb.core.query.regex
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
@@ -26,7 +26,8 @@ class CustomLectureRepository(
         name: String,
         credit: Int?,
         section: Section?,
-        pageable: Pageable
+        lastId: String?,
+        size: Int
     ): Flux<Lecture> =
         Query()
             .apply {
@@ -37,8 +38,9 @@ class CustomLectureRepository(
                 addCriteria(Lecture::name.regex(name, "i"))
                 credit?.let { addCriteria(Lecture::credit isEqualTo it) }
                 section?.let { addCriteria(Lecture::section isEqualTo it) }
-                with(Lecture::id.sortBy(Sort.Direction.ASC))
-                with(pageable)
+                lastId?.let { addCriteria(Lecture::id lt it) }
+                with(Lecture::id.sortBy(Sort.Direction.DESC))
+                limit(size)
             }
             .let { mongoTemplate.find(it) }
 }
