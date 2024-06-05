@@ -12,6 +12,7 @@ data class UpdatePostRequest(
     val title: String,
     val content: String,
     val images: List<FilePart>,
+    val isImageUpdated: Boolean
 ) {
     companion object {
         operator fun invoke(multipartData: MultiValueMap<String, Part>): UpdatePostRequest =
@@ -20,7 +21,9 @@ data class UpdatePostRequest(
                     boardId = (get("boardId")!!.first() as FormFieldPart).value(),
                     title = (get("title")!!.first() as FormFieldPart).value(),
                     content = (get("content")!!.first() as FormFieldPart).value(),
-                    images = (get("images") ?: emptyList()) as List<FilePart>
+                    images = (get("images") ?: emptyList()) as List<FilePart>,
+                    isImageUpdated = (get("isImageUpdated")!!.first() as FormFieldPart).value()
+                        .toBoolean()
                 )
             }
     }

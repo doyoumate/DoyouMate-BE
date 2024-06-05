@@ -83,7 +83,7 @@ class PostService(
                     )
                 }
                 .flatMap { post ->
-                    Flux.merge(images.map { image ->
+                    Flux.mergeSequential(images.map { image ->
                         s3Provider.upload(createObjectKey(post.id!!), image)
                     }).collectList()
                         .defaultIfEmpty(emptyList())
@@ -103,13 +103,16 @@ class PostService(
                 .filter { it.writer.id == authentication.id }
                 .switchIfEmpty(Mono.error(PermissionDeniedException()))
                 .flatMap { post ->
+                    val mono = Mono.justOrEmpty(takeIf { isImageUpdated })
+
                     Mono.zip(
-                        s3Provider.deleteAll(post.images.map { URI.create(it) })
+                        mono.flatMap { s3Provider.deleteAll(post.images.map { URI.create(it) }) }
                             .thenReturn(true),
-                        Flux.merge(images.map {
-                            s3Provider.upload(createObjectKey(id), it)
-                        }).collectList()
-                            .defaultIfEmpty(emptyList()),
+                        mono.flatMap {
+                            Flux.mergeSequential(images.map { s3Provider.upload(createObjectKey(id), it) })
+                                .collectList()
+                                .defaultIfEmpty(emptyList())
+                        }.defaultIfEmpty(post.images),
                         boardRepository.findById(boardId)
                     ).flatMap { (_, images, board) -> postRepository.save(updateEntity(post, board, images)) }
                 }
