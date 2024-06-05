@@ -8,6 +8,6 @@ data class Professor(
     val name: String,
     val phoneNumber: String,
     val email: String,
-    val score: Float,
+    val score: Float?,
     val role: String
 )
