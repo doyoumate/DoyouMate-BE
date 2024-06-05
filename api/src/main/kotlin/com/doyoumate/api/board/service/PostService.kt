@@ -83,7 +83,7 @@ class PostService(
                     )
                 }
                 .flatMap { post ->
-                    Flux.merge(images.map { image ->
+                    Flux.mergeSequential(images.map { image ->
                         s3Provider.upload(createObjectKey(post.id!!), image)
                     }).collectList()
                         .defaultIfEmpty(emptyList())
@@ -106,10 +106,7 @@ class PostService(
                     Mono.zip(
                         s3Provider.deleteAll(post.images.map { URI.create(it) })
                             .thenReturn(true),
-                        Flux.merge(images.map {
-                            s3Provider.upload(createObjectKey(id), it)
-                        }).collectList()
-                            .defaultIfEmpty(emptyList()),
+                            Flux.mergeSequential(images.map { s3Provider.upload(createObjectKey(id), it) })
                         boardRepository.findById(boardId)
                     ).flatMap { (_, images, board) -> postRepository.save(updateEntity(post, board, images)) }
                 }
