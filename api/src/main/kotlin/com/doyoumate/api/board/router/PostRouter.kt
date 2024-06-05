@@ -15,7 +15,7 @@ class PostRouter {
     fun postRoutes(handler: PostHandler): RouterFunction<ServerResponse> =
         router {
             "/post".nest {
-                GET("", queryParams("content", "page", "size"), handler::searchPosts)
+                GET("", queryParams("content", "size"), handler::searchPosts)
                 GET("/my", handler::getMyPosts)
                 GET("/liked", handler::getLikedPosts)
                 GET("/popular", handler::getPopularPosts)

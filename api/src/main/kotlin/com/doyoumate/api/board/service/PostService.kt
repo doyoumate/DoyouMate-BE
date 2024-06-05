@@ -18,7 +18,6 @@ import com.doyoumate.domain.board.repository.PostRepository
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
 import com.github.jwt.security.DefaultJwtAuthentication
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
@@ -54,8 +53,13 @@ class PostService(
         postRepository.findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull()
             .map { PostResponse(it) }
 
-    fun searchPosts(boardId: String?, content: String, pageable: Pageable): Flux<PostResponse> =
-        customPostRepository.search(boardId, content, pageable)
+    fun searchPosts(
+        boardId: String?,
+        content: String,
+        lastCreatedDate: LocalDateTime?,
+        size: Int
+    ): Flux<PostResponse> =
+        customPostRepository.search(boardId, content, lastCreatedDate, size)
             .map { PostResponse(it) }
 
     @Transactional
