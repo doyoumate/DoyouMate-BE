@@ -15,7 +15,7 @@ class LectureRouter {
         router {
             "/lecture".nest {
                 GET("/filter", handler::getFilter)
-                GET("", queryParams("name", "size"), handler::searchLectures)
+                GET("", queryParams("name", "size"), handler::searchLecturePage)
                 GET("", queryParams("ids"), handler::getLecturesByIds)
                 PATCH("/{id}/mark", handler::markLectureById)
             }

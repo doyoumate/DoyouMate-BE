@@ -53,13 +53,13 @@ class PostService(
         postRepository.findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull()
             .map { PostResponse(it) }
 
-    fun searchPosts(
+    fun searchPostPage(
         boardId: String?,
         content: String,
         lastCreatedDate: LocalDateTime?,
         size: Int
     ): Flux<PostResponse> =
-        customPostRepository.search(boardId, content, lastCreatedDate, size)
+        customPostRepository.searchPage(boardId, content, lastCreatedDate, size)
             .map { PostResponse(it) }
 
     @Transactional

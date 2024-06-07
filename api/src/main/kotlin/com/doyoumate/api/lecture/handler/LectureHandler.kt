@@ -19,11 +19,11 @@ class LectureHandler(
         ServerResponse.ok()
             .body(lectureService.getLecturesByIds(request.getQueryParam<String>("ids")!!.split(",")))
 
-    fun searchLectures(request: ServerRequest): Mono<ServerResponse> =
+    fun searchLecturePage(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             ServerResponse.ok()
                 .body(
-                    lectureService.searchLectures(
+                    lectureService.searchLecturePage(
                         getQueryParam("year"),
                         getQueryParam("grade"),
                         getQueryParam<String>("semester")?.let { Semester(it) },

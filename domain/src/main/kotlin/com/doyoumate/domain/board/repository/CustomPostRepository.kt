@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 class CustomPostRepository(
     private val mongoTemplate: ReactiveMongoTemplate
 ) {
-    fun search(
+    fun searchPage(
         boardId: String?,
         content: String,
         lastCreatedDate: LocalDateTime?,

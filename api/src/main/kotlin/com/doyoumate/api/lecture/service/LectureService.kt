@@ -23,7 +23,7 @@ class LectureService(
         lectureRepository.findAllByIdIn(ids)
             .map { LectureResponse(it) }
 
-    fun searchLectures(
+    fun searchLecturePage(
         year: Int?,
         grade: Int?,
         semester: Semester?,
@@ -34,7 +34,7 @@ class LectureService(
         lastId: String?,
         size: Int
     ): Flux<LectureResponse> =
-        customLectureRepository.search(year, grade, semester, major, name, credit, section, lastId, size)
+        customLectureRepository.searchPage(year, grade, semester, major, name, credit, section, lastId, size)
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =
