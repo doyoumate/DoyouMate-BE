@@ -13,8 +13,7 @@ interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
     fun findAllByIdIn(ids: Collection<String>): Flux<Lecture>
 
     @Aggregation(
-        pipeline = [
-            """
+        """
             { 
                 ${'$'}group: { 
                     _id: null, 
@@ -26,23 +25,20 @@ interface LectureRepository : ReactiveMongoRepository<Lecture, String> {
                     section: { ${'$'}addToSet: '${'$'}section' }
                 } 
             }
-            """
-        ]
+        """
     )
     fun getFilter(): Mono<Filter>
 
     @Aggregation(
-        pipeline = [
-            """
+        """
             { 
                 ${'$'}group: { 
                     _id: null, 
                     professorIds: { ${'$'}addToSet: '${'$'}professorId' },
                 } 
             }
-            """,
-            "{ \$unwind: '\$professorIds' }"
-        ]
+        """,
+        "{ \$unwind: '\$professorIds' }"
     )
     fun getProfessorIds(): Flux<String>
 }
