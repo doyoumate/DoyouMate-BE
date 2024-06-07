@@ -48,9 +48,7 @@ class PostHandler(
                     postService.searchPosts(
                         getQueryParam("boardId"),
                         getQueryParam("content")!!,
-                        getQueryParam<String>("lastCreatedDate")?.let {
-                            LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                        },
+                        getQueryParam("lastCreatedDate"),
                         getQueryParam("size")!!
                     )
                 )

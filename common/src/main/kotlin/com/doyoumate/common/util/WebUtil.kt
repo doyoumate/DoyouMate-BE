@@ -8,6 +8,8 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.queryParamOrNull
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 fun RouterFunctionDsl.queryParams(vararg names: String): RequestPredicate =
     names.map {
@@ -23,6 +25,7 @@ inline fun <reified T> ServerRequest.getQueryParam(name: String): T? =
                 Float::class -> toFloat()
                 Double::class -> toDouble()
                 Boolean::class -> toBoolean()
+                LocalDateTime::class -> LocalDateTime.parse(this, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                 else -> this
             } as T
         }
