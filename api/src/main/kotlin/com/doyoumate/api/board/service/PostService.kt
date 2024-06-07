@@ -41,25 +41,29 @@ class PostService(
             .switchIfEmpty(Mono.error(PostNotFoundException()))
             .map { PostResponse(it) }
 
-    fun getPostsByWriterId(writerId: String): Flux<PostResponse> =
-        postRepository.findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId)
+    fun getPostPageByWriterId(writerId: String, lastCreatedDate: LocalDateTime?, pageSize: Int): Flux<PostResponse> =
+        customPostRepository.getPageByWriterId(writerId, lastCreatedDate, pageSize)
             .map { PostResponse(it) }
 
-    fun getLikedPostsByStudentId(studentId: String): Flux<PostResponse> =
-        postRepository.findAllByLikedStudentIdsContainsAndDeletedDateIsNullOrderByCreatedDateDesc(studentId)
+    fun getLikedPostPageByStudentId(
+        studentId: String,
+        lastCreatedDate: LocalDateTime?,
+        size: Int
+    ): Flux<PostResponse> =
+        customPostRepository.getPageByLikedStudentIdsIn(studentId, lastCreatedDate, size)
             .map { PostResponse(it) }
 
     fun getPopularPosts(): Flux<PostResponse> =
         postRepository.findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull()
             .map { PostResponse(it) }
 
-    fun searchPosts(
+    fun searchPostPage(
         boardId: String?,
         content: String,
         lastCreatedDate: LocalDateTime?,
         size: Int
     ): Flux<PostResponse> =
-        customPostRepository.search(boardId, content, lastCreatedDate, size)
+        customPostRepository.searchPage(boardId, content, lastCreatedDate, size)
             .map { PostResponse(it) }
 
     @Transactional
@@ -103,7 +107,7 @@ class PostService(
                 .filter { it.writer.id == authentication.id }
                 .switchIfEmpty(Mono.error(PermissionDeniedException()))
                 .flatMap { post ->
-                    val mono = Mono.justOrEmpty(takeIf { isImageUpdated })
+                    val mono = Mono.justOrEmpty(isImageUpdated)
 
                     Mono.zip(
                         mono.flatMap { s3Provider.deleteAll(post.images.map { URI.create(it) }) }
