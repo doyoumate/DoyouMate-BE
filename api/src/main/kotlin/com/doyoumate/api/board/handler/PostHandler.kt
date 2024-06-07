@@ -12,8 +12,6 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component2
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Handler
 class PostHandler(
@@ -23,29 +21,45 @@ class PostHandler(
         ServerResponse.ok()
             .body(postService.getPostById(request.pathVariable("id")))
 
-    fun getMyPosts(request: ServerRequest): Mono<ServerResponse> =
-        request.getAuthentication()
-            .flatMap {
-                ServerResponse.ok()
-                    .body(postService.getPostsByWriterId(it.id))
-            }
+    fun getMyPostPage(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            getAuthentication()
+                .flatMap {
+                    ServerResponse.ok()
+                        .body(
+                            postService.getPostPageByWriterId(
+                                it.id,
+                                getQueryParam("lastCreatedDate"),
+                                getQueryParam("size")!!
+                            )
+                        )
+                }
+        }
 
-    fun getLikedPosts(request: ServerRequest): Mono<ServerResponse> =
-        request.getAuthentication()
-            .flatMap {
-                ServerResponse.ok()
-                    .body(postService.getLikedPostsByStudentId(it.id))
-            }
+    fun getLikedPostPage(request: ServerRequest): Mono<ServerResponse> =
+        with(request) {
+            getAuthentication()
+                .flatMap {
+                    ServerResponse.ok()
+                        .body(
+                            postService.getLikedPostPageByStudentId(
+                                it.id,
+                                getQueryParam("lastCreatedDate"),
+                                getQueryParam("size")!!
+                            )
+                        )
+                }
+        }
 
     fun getPopularPosts(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(postService.getPopularPosts())
 
-    fun searchPosts(request: ServerRequest): Mono<ServerResponse> =
+    fun searchPostPage(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
             ServerResponse.ok()
                 .body(
-                    postService.searchPosts(
+                    postService.searchPostPage(
                         getQueryParam("boardId"),
                         getQueryParam("content")!!,
                         getQueryParam("lastCreatedDate"),
