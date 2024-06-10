@@ -1,8 +1,5 @@
 package com.doyoumate.api.board.service
 
-import com.doyoumate.common.util.collectSet
-import com.doyoumate.common.util.component1
-import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.exception.PermissionDeniedException
 import com.doyoumate.domain.board.dto.request.CreateCommentRequest
 import com.doyoumate.domain.board.dto.request.UpdateCommentRequest
@@ -20,6 +17,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.time.LocalDateTime
 
 @Service
@@ -29,7 +28,8 @@ class CommentService(
     private val studentRepository: StudentRepository
 ) {
     fun getCommentsByPostId(postId: String): Flux<CommentResponse> =
-        commentRepository.findAllByPostIdAndDeletedDateIsNullOrderByCreatedDateAsc(postId)
+        commentRepository.findAllByPostIdOrderByCreatedDateAsc(postId)
+            .map { it.deletedDate?.run { it.copy(content = "삭제된 댓글입니다.") } ?: it }
             .map { CommentResponse(it) }
 
     fun getCommentsByWriterId(writerId: String): Flux<CommentResponse> =
@@ -62,8 +62,9 @@ class CommentService(
                             )
                         )
                         .flatMap {
-                            postRepository.save(post.copy(commentIds = post.commentIds.apply { add(it.id!!) }))
-                                .thenReturn(it)
+                            postRepository.save(
+                                post.copy(commentIds = post.commentIds.apply { add(it.id!!) })
+                            ).thenReturn(it)
                         }
                 }
                 .map { CommentResponse(it) }
@@ -87,19 +88,11 @@ class CommentService(
             .switchIfEmpty(Mono.error(CommentNotFoundException()))
             .filter { it.writer.id == authentication.id }
             .switchIfEmpty(Mono.error(PermissionDeniedException()))
-            .flatMap { comment ->
-                commentRepository.save(comment.copy(deletedDate = LocalDateTime.now()))
-                    .mergeWith(
-                        commentRepository.findAllByCommentIdAndDeletedDateIsNull(comment.id!!)
-                            .flatMap { commentRepository.save(it.copy(deletedDate = LocalDateTime.now())) }
-                    )
-                    .map { it.id!! }
-                    .collectSet()
-                    .zipWith(postRepository.findByIdAndDeletedDateIsNull(comment.postId))
+            .flatMap {
+                commentRepository.save(it.copy(deletedDate = LocalDateTime.now()))
+                    .zipWith(postRepository.findById(it.postId))
             }
-            .flatMap { (ids, post) ->
-                postRepository.save(post.copy(commentIds = post.commentIds.apply { removeAll(ids) }))
-            }
+            .flatMap { (_, post) -> postRepository.save(post.copy(commentIds = post.commentIds.apply { remove(id) })) }
             .then()
 
     fun likeCommentById(id: String, authentication: DefaultJwtAuthentication): Mono<CommentResponse> =

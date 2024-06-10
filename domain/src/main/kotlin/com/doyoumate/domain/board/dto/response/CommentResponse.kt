@@ -10,7 +10,8 @@ data class CommentResponse(
     val writer: WriterResponse,
     val content: String,
     val likedStudentIds: Set<String>,
-    val createdDate: LocalDateTime
+    val createdDate: LocalDateTime,
+    val deletedDate: LocalDateTime?
 ) {
     companion object {
         operator fun invoke(comment: Comment): CommentResponse =
@@ -22,7 +23,8 @@ data class CommentResponse(
                     writer = WriterResponse(writer),
                     content = content,
                     likedStudentIds = likedStudentIds,
-                    createdDate = createdDate!!
+                    createdDate = createdDate!!,
+                    deletedDate = deletedDate
                 )
             }
     }

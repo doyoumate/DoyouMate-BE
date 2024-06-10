@@ -14,7 +14,7 @@ interface CommentRepository : ReactiveMongoRepository<Comment, String> {
 
     fun findAllByCommentIdAndDeletedDateIsNull(commentId: String): Flux<Comment>
 
-    fun findAllByPostIdAndDeletedDateIsNullOrderByCreatedDateAsc(postId: String): Flux<Comment>
+    fun findAllByPostIdOrderByCreatedDateAsc(postId: String): Flux<Comment>
 
     fun findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId: String): Flux<Comment>
 }
