@@ -21,8 +21,10 @@ class LectureService(
     private val customLectureRepository: CustomLectureRepository,
     private val studentRepository: StudentRepository
 ) {
-    fun getLecturesByIds(ids: Collection<String>): Flux<LectureResponse> =
-        lectureRepository.findAllByIdIn(ids)
+    fun getRelatedLecturesById(id: String): Flux<LectureResponse> =
+        lectureRepository.findById(id)
+            .switchIfEmpty(Mono.error(LectureNotFoundException()))
+            .flatMapMany { lectureRepository.findAllByNameLikeAndYearLessThanOrderByYearDesc(it.name, it.year) }
             .map { LectureResponse(it) }
 
     fun searchLecturePage(
