@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 class CustomPostRepository(
     private val mongoTemplate: ReactiveMongoTemplate
 ) {
-    fun search(
+    fun searchPage(
         boardId: String?,
         content: String,
         lastCreatedDate: LocalDateTime?,
@@ -25,9 +25,39 @@ class CustomPostRepository(
                 boardId?.let { addCriteria(Criteria.where("board.id").isEqualTo(it)) }
                 addCriteria(Criteria().orOperator(Post::title.regex(content, "i"), Post::content.regex(content, "i")))
                 addCriteria(Post::deletedDate isEqualTo null)
-                lastCreatedDate?.let { addCriteria(Post::createdDate lt lastCreatedDate) }
-                with(Post::createdDate sortBy Sort.Direction.DESC)
-                limit(size)
+                paging(lastCreatedDate, size)
             }
             .let { mongoTemplate.find(it) }
+
+    fun getPageByWriterId(
+        writerId: String,
+        lastCreatedDate: LocalDateTime?,
+        size: Int
+    ): Flux<Post> =
+        Query()
+            .apply {
+                addCriteria(Criteria.where("writer.id").isEqualTo(writerId))
+                addCriteria(Post::deletedDate isEqualTo null)
+                paging(lastCreatedDate, size)
+            }
+            .let { mongoTemplate.find(it) }
+
+    fun getPageByLikedStudentIdsIn(
+        studentId: String,
+        lastCreatedDate: LocalDateTime?,
+        size: Int
+    ): Flux<Post> =
+        Query()
+            .apply {
+                addCriteria(Criteria.where(Post::likedStudentIds.name).`in`(studentId))
+                addCriteria(Post::deletedDate isEqualTo null)
+                paging(lastCreatedDate, size)
+            }
+            .let { mongoTemplate.find(it) }
+
+    private fun Query.paging(lastCreatedDate: LocalDateTime?, size: Int) {
+        lastCreatedDate?.let { addCriteria(Post::createdDate lt it) }
+        with(Post::createdDate sortBy Sort.Direction.DESC)
+        limit(size)
+    }
 }

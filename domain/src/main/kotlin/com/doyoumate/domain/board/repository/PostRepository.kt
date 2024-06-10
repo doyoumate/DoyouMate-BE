@@ -15,17 +15,11 @@ interface PostRepository : ReactiveMongoRepository<Post, String> {
 
     fun findAllByBoardIdAndDeletedDateIsNull(boardId: String): Flux<Post>
 
-    fun findAllByWriterIdAndDeletedDateIsNullOrderByCreatedDateDesc(writerId: String): Flux<Post>
-
-    fun findAllByLikedStudentIdsContainsAndDeletedDateIsNullOrderByCreatedDateDesc(studentId: String): Flux<Post>
-
     @Aggregation(
-        pipeline = [
-            "{ \$match: { deletedDate: null } }",
-            "{ \$addFields: { count: { \$size: '\$likedStudentIds' } }}",
-            "{ \$sort: { count: -1 } }",
-            "{ \$limit: 2 }"
-        ]
+        "{ \$match: { deletedDate: null } }",
+        "{ \$addFields: { count: { \$size: '\$likedStudentIds' } }}",
+        "{ \$sort: { count: -1 } }",
+        "{ \$limit: 2 }"
     )
     fun findTop2OrderByLikedStudentIdsSizeAndDeletedDateIsNull(): Flux<Post>
 }
