@@ -22,7 +22,5 @@ data class Student(
     val gpa: Float?,
     val rank: Int?,
     val role: Role = Role.USER,
-    val appliedLectureIds: HashSet<String> = hashSetOf(),
-    val preAppliedLectureIds: HashSet<String> = hashSetOf(),
     val markedLecturesIds: HashSet<String> = hashSetOf()
 )

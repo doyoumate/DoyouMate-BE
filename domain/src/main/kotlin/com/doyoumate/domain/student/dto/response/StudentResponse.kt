@@ -8,15 +8,13 @@ data class StudentResponse(
     val number: String,
     val name: String,
     val birthDate: LocalDate,
-    val phoneNumber: String?,
+    val phoneNumber: String,
     val major: String,
     val grade: Int,
     val semester: String,
     val status: String,
     val gpa: Float?,
     val rank: Int?,
-    val appliedLectureIds: HashSet<String>,
-    val preAppliedLectureIds: HashSet<String>,
     val markedLectureIds: HashSet<String>
 ) {
     companion object {
@@ -34,8 +32,6 @@ data class StudentResponse(
                     status = status,
                     gpa = gpa,
                     rank = rank,
-                    appliedLectureIds = appliedLectureIds,
-                    preAppliedLectureIds = preAppliedLectureIds,
                     markedLectureIds = markedLecturesIds
                 )
             }
