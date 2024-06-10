@@ -6,11 +6,10 @@ import com.doyoumate.common.util.getRows
 import com.doyoumate.common.util.getValue
 import com.doyoumate.domain.global.util.SuwingsRequests
 import com.doyoumate.domain.lecture.model.Lecture
-import com.doyoumate.domain.lecture.model.Plan
 import com.doyoumate.domain.lecture.model.Ratio
-import com.doyoumate.domain.lecture.model.enum.Evaluation
 import com.doyoumate.domain.lecture.model.enum.Section
 import com.doyoumate.domain.lecture.model.enum.Semester
+import com.doyoumate.domain.lecture.model.enum.Type
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import org.springframework.http.MediaType
@@ -34,8 +33,8 @@ class LectureClient(
             .flatMapMany { xmlMapper.getRows(it) }
             .delayElements(Duration.ofMillis(10))
             .flatMap { node ->
-                getPlan(node)
-                    .map {
+                getDetails(node)
+                    .map { details ->
                         with(node) {
                             Lecture(
                                 id = getValue<String>("EDUCUR_CORS_NO") + getValue<String>("LECT_NO"),
@@ -49,51 +48,52 @@ class LectureClient(
                                 room = getValue("LT_ROOM_NM"),
                                 date = getValue("LTTM"),
                                 credit = getValue("LCTPT"),
-                                section = getValue<String>("CTNCCH_FLD_DIV_CD").run {
-                                    if (isBlank()) null else Section(toInt())
-                                },
-                                plan = it
+                                section = getValue<String>("CTNCCH_FLD_DIV_CD")
+                                    .run { if (isBlank()) null else Section(toInt()) },
+                                type = Type(getValue("CPTN_DIV_CD")),
+                                limitStudentCount = details.getValue("TLSN_LMIT_PRNS_CNT"),
+                                limitStudentGrade = (1..6).toList()
+                                    .mapNotNull { grade ->
+                                        details.getValue<String>("SY${grade}_APLY_LMIT_TN")
+                                            .takeIf { it == "Y" }
+                                            ?.let { grade }
+                                    },
+                                note = details.getValue("OPEN_LECT_NOTI_CTNT"),
+                                ratio = details.getValue<String>("WKHS").replace(Regex("\\s"), "").split("/")
+                                    .run {
+                                        Ratio(
+                                            theory = get(0).ifBlank { "-1" }.toInt(),
+                                            practice = get(1).ifBlank { "-1" }.toInt()
+                                        )
+                                    },
                             )
                         }
                     }
             }
 
-    fun getAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
+    fun getAppliedLectureIdsByStudentNumber(studentNumber: String, year: Int, semester: Semester): Flux<String> =
         webClient.post()
             .contentType(MediaType.APPLICATION_XML)
-            .bodyValue(SuwingsRequests.getAppliedLecturesRequest(studentNumber))
+            .bodyValue(SuwingsRequests.getAppliedLecturesRequest(studentNumber, year, semester))
             .retrieve()
             .bodyToMono<String>()
             .flatMapMany { xmlMapper.getRows(it) }
             .map { it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO") }
 
-    fun getPreAppliedLectureIdsByStudentNumber(studentNumber: String): Flux<String> =
+    fun getPreAppliedLectureIdsByStudentNumber(studentNumber: String, year: Int, semester: Semester): Flux<String> =
         webClient.post()
             .contentType(MediaType.APPLICATION_XML)
-            .bodyValue(SuwingsRequests.getPreAppliedLecturesRequest(studentNumber))
+            .bodyValue(SuwingsRequests.getPreAppliedLecturesRequest(studentNumber, year, semester))
             .retrieve()
             .bodyToMono<String>()
             .flatMapMany { xmlMapper.getRows(it) }
             .map { it.getValue<String>("EDUCUR_CORS_NO") + it.getValue<String>("LECT_NO") }
 
-    private fun getPlan(node: JsonNode): Mono<Plan> =
+    private fun getDetails(node: JsonNode): Mono<JsonNode> =
         webClient.post()
             .contentType(MediaType.APPLICATION_XML)
-            .bodyValue(SuwingsRequests.getPlanRequest(node))
+            .bodyValue(SuwingsRequests.getLectureDetailsRequest(node))
             .retrieve()
             .bodyToMono<String>()
             .flatMap { xmlMapper.getRow(it) }
-            .map {
-                Plan(
-                    ratio = Ratio(
-                        theory = it.getValue<String>("THEORY_WKHS").ifBlank { "0" }.toInt(),
-                        practice = it.getValue<String>("PRAC_WKHS").ifBlank { "0" }.toInt()
-                    ),
-                    overview = it.getValue("LT_PURP_SMRY_CTNT"),
-                    objective = it.getValue("LRN_TGET_CTNT"),
-                    type = it.getValue("SBJT_CLSF_CD"),
-                    evaluation = Evaluation(it.getValue<String>("LSRT_EVAL_DIV_CD")),
-                    prerequisites = it.getValue("PRE_LRN_CTNT")
-                )
-            }
 }
