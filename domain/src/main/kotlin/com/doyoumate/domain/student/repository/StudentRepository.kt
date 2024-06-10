@@ -10,7 +10,5 @@ import reactor.core.publisher.Mono
 interface StudentRepository : ReactiveMongoRepository<Student, String> {
     fun findByNumber(number: String): Mono<Student>
 
-    fun findAllByAppliedLectureIdsContains(lectureIds: String): Flux<Student>
-
-    fun findAllByPreAppliedLectureIdsContains(lectureIds: String): Flux<Student>
+    fun findAllByNumberIn(numbers: List<String>): Flux<Student>
 }
