@@ -33,8 +33,6 @@ class CustomStudentRepository(
                         set(::gpa to gpa)
                         set(::rank to rank)
                         setOnInsert(::role to role)
-                        set(::appliedLectureIds to appliedLectureIds)
-                        set(::preAppliedLectureIds to preAppliedLectureIds)
                         setOnInsert(::markedLecturesIds to emptySet())
                     }
                 )
