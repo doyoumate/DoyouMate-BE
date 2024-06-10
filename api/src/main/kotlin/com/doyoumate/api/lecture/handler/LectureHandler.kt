@@ -37,6 +37,20 @@ class LectureHandler(
                 )
         }
 
+    fun getAppliedLectures(request: ServerRequest): Mono<ServerResponse> =
+        request.getAuthentication()
+            .flatMap {
+                ServerResponse.ok()
+                    .body(lectureService.getAppliedLectures(it.id))
+            }
+
+    fun getPreAppliedLectures(request: ServerRequest): Mono<ServerResponse> =
+        request.getAuthentication()
+            .flatMap {
+                ServerResponse.ok()
+                    .body(lectureService.getPreAppliedLectures(it.id))
+            }
+
     fun getFilter(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
             .body(lectureService.getFilter())

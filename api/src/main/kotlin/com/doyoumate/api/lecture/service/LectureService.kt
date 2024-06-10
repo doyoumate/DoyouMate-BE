@@ -14,11 +14,13 @@ import com.github.jwt.security.DefaultJwtAuthentication
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 
 @Service
 class LectureService(
     private val lectureRepository: LectureRepository,
     private val customLectureRepository: CustomLectureRepository,
+    private val lectureClient: LectureClient,
     private val studentRepository: StudentRepository
 ) {
     fun getRelatedLecturesById(id: String): Flux<LectureResponse> =
@@ -39,6 +41,28 @@ class LectureService(
         size: Int
     ): Flux<LectureResponse> =
         customLectureRepository.searchPage(year, grade, semester, major, name, credit, section, lastId, size)
+            .map { LectureResponse(it) }
+
+    fun getAppliedLectures(studentId: String): Flux<LectureResponse> =
+        studentRepository.findById(studentId)
+            .switchIfEmpty(Mono.error(StudentNotFoundException()))
+            .flatMapMany { student ->
+                LocalDate.now()
+                    .let { lectureClient.getAppliedLectureIdsByStudentNumber(student.number, it.year, Semester(it)) }
+            }
+            .collectList()
+            .flatMapMany { lectureRepository.findAllByIdIn(it) }
+            .map { LectureResponse(it) }
+
+    fun getPreAppliedLectures(studentId: String): Flux<LectureResponse> =
+        studentRepository.findById(studentId)
+            .switchIfEmpty(Mono.error(StudentNotFoundException()))
+            .flatMapMany { student ->
+                LocalDate.now()
+                    .let { lectureClient.getPreAppliedLectureIdsByStudentNumber(student.number, it.year, Semester(it)) }
+            }
+            .collectList()
+            .flatMapMany { lectureRepository.findAllByIdIn(it) }
             .map { LectureResponse(it) }
 
     fun getFilter(): Mono<FilterResponse> =
