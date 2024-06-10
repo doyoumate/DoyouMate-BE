@@ -1,8 +1,6 @@
 package com.doyoumate.api.board.service
 
 import com.doyoumate.api.global.s3.S3Provider
-import com.doyoumate.common.util.component1
-import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.exception.PermissionDeniedException
 import com.doyoumate.domain.board.dto.request.CreatePostRequest
 import com.doyoumate.domain.board.dto.request.UpdatePostRequest
@@ -22,6 +20,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import reactor.kotlin.core.util.function.component3
 import java.net.URI
 import java.time.LocalDateTime
@@ -107,7 +107,7 @@ class PostService(
                 .filter { it.writer.id == authentication.id }
                 .switchIfEmpty(Mono.error(PermissionDeniedException()))
                 .flatMap { post ->
-                    val mono = Mono.justOrEmpty(isImageUpdated)
+                    val mono = Mono.justOrEmpty(isImageUpdated.takeIf { it })
 
                     Mono.zip(
                         mono.flatMap { s3Provider.deleteAll(post.images.map { URI.create(it) }) }

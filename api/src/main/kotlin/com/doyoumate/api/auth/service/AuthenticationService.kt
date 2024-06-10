@@ -1,7 +1,5 @@
 package com.doyoumate.api.auth.service
 
-import com.doyoumate.common.util.component1
-import com.doyoumate.common.util.component2
 import com.doyoumate.domain.auth.dto.request.LoginRequest
 import com.doyoumate.domain.auth.dto.request.RefreshRequest
 import com.doyoumate.domain.auth.dto.request.SendCertificationRequest
@@ -28,6 +26,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.onErrorResume
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 
 @Service
 class AuthenticationService(

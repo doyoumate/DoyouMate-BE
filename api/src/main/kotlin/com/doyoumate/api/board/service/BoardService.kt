@@ -1,6 +1,5 @@
 package com.doyoumate.api.board.service
 
-import com.doyoumate.common.util.component1
 import com.doyoumate.domain.board.dto.request.CreateBoardRequest
 import com.doyoumate.domain.board.dto.request.UpdateBoardRequest
 import com.doyoumate.domain.board.dto.response.BoardResponse
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
 import java.time.LocalDateTime
 
 @Service

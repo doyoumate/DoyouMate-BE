@@ -1,7 +1,5 @@
 package com.doyoumate.api.global.s3
 
-import com.doyoumate.common.util.component1
-import com.doyoumate.common.util.component2
 import com.doyoumate.common.util.toByteArray
 import com.doyoumate.domain.board.exception.ImageOverSizeException
 import org.springframework.beans.factory.annotation.Value
@@ -9,6 +7,8 @@ import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.Delete
