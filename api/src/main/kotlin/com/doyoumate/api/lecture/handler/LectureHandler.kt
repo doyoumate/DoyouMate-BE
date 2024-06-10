@@ -15,9 +15,9 @@ import reactor.core.publisher.Mono
 class LectureHandler(
     private val lectureService: LectureService
 ) {
-    fun getLecturesByIds(request: ServerRequest): Mono<ServerResponse> =
+    fun getRelatedLecturesById(request: ServerRequest): Mono<ServerResponse> =
         ServerResponse.ok()
-            .body(lectureService.getLecturesByIds(request.getQueryParam<String>("ids")!!.split(",")))
+            .body(lectureService.getRelatedLecturesById(request.pathVariable("id")))
 
     fun searchLecturePage(request: ServerRequest): Mono<ServerResponse> =
         with(request) {
