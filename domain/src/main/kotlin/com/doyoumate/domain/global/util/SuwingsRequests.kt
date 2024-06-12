@@ -107,4 +107,22 @@ object SuwingsRequests {
                 <LECT_NO value="${lectureId.substring(10)}" />
            </rqM6_F0>
         """
+
+    fun getChapelInformationRequest(studentNumber: String, year: Int, semester: Semester) =
+        """
+            <rqM0_F0 task="system.commonTask" action="comSelect" xda="academic.ah.ah03.ah03_20100312_m_M0_F0_xda" con="sudev">
+				<YY value="$year"/>
+				<SHTM_CD value="${semester.id}"/>
+				<STUNO value="$studentNumber"/>
+			</rqM0_F0>
+        """
+
+    fun getChapelAttendanceRequest(studentNumber: String, year: Int, semester: Semester) =
+        """
+            <rqM0_F1 task="system.commonTask" action="comSelect" xda="academic.ah.ah03.ah03_20100312_m_M0_F1_xda" con="sudev">
+				<YY value="$year"/>
+				<SHTM_CD value="${semester.id}"/>
+				<STUNO value="$studentNumber"/>
+			</rqM0_F1>
+        """
 }
