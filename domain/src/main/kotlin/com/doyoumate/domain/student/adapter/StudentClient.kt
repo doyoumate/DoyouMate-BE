@@ -6,6 +6,8 @@ import com.doyoumate.common.util.getRows
 import com.doyoumate.common.util.getValue
 import com.doyoumate.domain.global.util.SuwingsRequests
 import com.doyoumate.domain.lecture.model.enum.Semester
+import com.doyoumate.domain.student.dto.response.Attendance
+import com.doyoumate.domain.student.dto.response.ChapelResponse
 import com.doyoumate.domain.student.model.Student
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
@@ -64,7 +66,7 @@ class StudentClient(
                     }
             }
 
-    fun getAppliedStudentIdsByLectureId(lectureId: String, year: Int, semester: Semester): Flux<String> =
+    fun getAppliedStudentNumbersByLectureId(lectureId: String, year: Int, semester: Semester): Flux<String> =
         webClient.post()
             .contentType(MediaType.APPLICATION_XML)
             .bodyValue(SuwingsRequests.getAppliedStudentsRequest(lectureId, year, semester))
@@ -72,6 +74,44 @@ class StudentClient(
             .bodyToMono<String>()
             .flatMapMany { xmlMapper.getRows(it) }
             .map { it.getValue("STUNO") }
+
+    fun getChapelByStudentNumber(studentNumber: String, year: Int, semester: Semester): Mono<ChapelResponse> =
+        webClient.post()
+            .contentType(MediaType.APPLICATION_XML)
+            .bodyValue(SuwingsRequests.getChapelInformationRequest(studentNumber, year, semester))
+            .retrieve()
+            .bodyToMono<String>()
+            .flatMap { xmlMapper.getRow(it) }
+            .zipWith(
+                getChapelAttendanceByStudentNumber(studentNumber, year, semester)
+                    .collectList()
+            )
+            .map { (node, attendances) ->
+                node.run {
+                    ChapelResponse(
+                        date = "${ChapelResponse.DAYS[getValue<Int>("DAY_CD") - 1]}요일 ${getValue<Int>("LTTM_CD")}교시",
+                        room = getValue<String>("SPC_NM"),
+                        seat = "(${ChapelResponse.COLUMNS[getValue<Int>("COL_DIV_CD") - 1]})열 ${getValue<String>("CHPL_SEAT_NO")}",
+                        attendances = attendances
+                    )
+                }
+            }
+
+    private fun getChapelAttendanceByStudentNumber(studentNumber: String, year: Int, semester: Semester):
+        Flux<Attendance> =
+        webClient.post()
+            .contentType(MediaType.APPLICATION_XML)
+            .bodyValue(SuwingsRequests.getChapelAttendanceRequest(studentNumber, year, semester))
+            .retrieve()
+            .bodyToMono<String>()
+            .flatMapMany { xmlMapper.getRows(it) }
+            .map {
+                Attendance(
+                    date = LocalDate.parse(it.getValue("CHPL_DT"), DateTimeFormatter.ofPattern("yyyyMMdd")),
+                    isAttended = it.getValue<String>("CHPL_ATTND").run { equals("Y") },
+                    isOnline = it.getValue<String>("DIV").run { equals("온라인") }
+                )
+            }
 
     private fun getProfileByStudentNumber(studentNumber: String, year: Int, semester: Semester): Mono<JsonNode> =
         webClient.post()

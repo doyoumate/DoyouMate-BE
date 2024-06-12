@@ -1,8 +1,10 @@
 package com.doyoumate.api.student.service
 
+import com.doyoumate.domain.lecture.model.enum.Semester
 import com.doyoumate.domain.lecture.repository.LectureRepository
 import com.doyoumate.domain.student.adapter.StudentClient
 import com.doyoumate.domain.student.dto.response.AppliedStudentResponse
+import com.doyoumate.domain.student.dto.response.ChapelResponse
 import com.doyoumate.domain.student.dto.response.StudentResponse
 import com.doyoumate.domain.student.exception.StudentNotFoundException
 import com.doyoumate.domain.student.repository.StudentRepository
@@ -23,11 +25,15 @@ class StudentService(
 
     fun getAppliedStudentsByLectureId(lectureId: String): Flux<AppliedStudentResponse> =
         lectureRepository.findById(lectureId)
-            .flatMapMany { studentClient.getAppliedStudentIdsByLectureId(lectureId, it.year, it.semester) }
+            .flatMapMany { studentClient.getAppliedStudentNumbersByLectureId(lectureId, it.year, it.semester) }
             .collectList()
             .flatMapMany { studentRepository.findAllByNumberIn(it) }
             .map { AppliedStudentResponse(it) }
 
     fun getPreAppliedStudentsByLectureId(lectureId: String): Flux<AppliedStudentResponse> =
         TODO("수강신청 기간에 구현")
+
+    fun getChapelByIdAndYearAndSemester(id: String, year: Int, semester: Semester): Mono<ChapelResponse> =
+        studentRepository.findById(id)
+            .flatMap { studentClient.getChapelByStudentNumber(it.number, year, semester) }
 }

@@ -16,6 +16,7 @@ class StudentRouter {
                 GET("/applied/lectureId/{lectureId}", handler::getAppliedStudentsByLectureId)
                 GET("/pre-applied/lectureId/{lectureId}", handler::getPreAppliedStudentsByLectureId)
                 GET("/me", handler::getStudent)
+                GET("/chapel", handler::getMyChapel)
             }
         }
 }
