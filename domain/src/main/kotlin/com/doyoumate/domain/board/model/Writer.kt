@@ -5,7 +5,8 @@ import com.doyoumate.domain.student.model.Student
 data class Writer(
     val id: String,
     val major: String,
-    val grade: Int
+    val grade: Int,
+    val status: String
 ) {
     companion object {
         operator fun invoke(student: Student): Writer =
@@ -14,6 +15,7 @@ data class Writer(
                     id = id!!,
                     major = major,
                     grade = grade,
+                    status = status
                 )
             }
     }
