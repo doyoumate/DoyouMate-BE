@@ -10,6 +10,8 @@ import reactor.core.publisher.Mono
 interface CommentRepository : ReactiveMongoRepository<Comment, String> {
     fun findByIdAndDeletedDateIsNull(id: String): Mono<Comment>
 
+    fun findAllByWriterId(writerId: String): Flux<Comment>
+
     fun findAllByPostIdAndDeletedDateIsNull(postId: String): Flux<Comment>
 
     fun findAllByCommentIdAndDeletedDateIsNull(commentId: String): Flux<Comment>

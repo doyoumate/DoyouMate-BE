@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono
 interface PostRepository : ReactiveMongoRepository<Post, String> {
     fun findByIdAndDeletedDateIsNull(id: String): Mono<Post>
 
+    fun findAllByWriterId(writerId: String): Flux<Post>
+
     fun findAllByBoardId(boardId: String): Flux<Post>
 
     fun findAllByBoardIdAndDeletedDateIsNull(boardId: String): Flux<Post>
